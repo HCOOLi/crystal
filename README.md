@@ -1,4 +1,4 @@
 # crystal
-crystal of polymer
-make
+crystal of polymer  
+make  
 python main.py
