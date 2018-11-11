@@ -1,6 +1,6 @@
 #include<string>
 #include <boost/python.hpp>
-#include"../data_struct/polymer.h"
+#include"polymer.h"
 
 namespace py=boost::python;
 
