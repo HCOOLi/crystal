@@ -5,6 +5,7 @@ import json
 from vpython import *
 import math
 import matplotlib.pyplot as plt
+import os
 
 import numpy as np
 from crystal import Room
@@ -132,37 +133,13 @@ class pyRoom(Room):
                 continue
             for point in chain:
                 if (ifp1p2(point2, point)):
-                 pass
+                    pass
                 else:
-                 c = curve(color=color.yellow, radius=0.2)
+                    c = curve(color=color.yellow, radius=0.2)
                 c.append(vector(point[0], point[1], point[2]))
                 point2 = point.copy()
+        return scene
 
-    def loadf(self):
-        with open('64/f %d,%d,%d.json' % (1 * 10, 1 * 10, 10 * 10), 'r') as file:
-            all_line_txt = file.readline()  # 读所有行
-            # print(all_line_txt)
-            t, f = json.loads(all_line_txt)
-            t = np.asarray(t)
-            f = np.asarray(f)
-            range1 = list(range(70000, 200000))
-            z1 = np.polyfit(t[range1], f[range1], 1)
-            p1 = np.poly1d(z1)
-            print(z1)
-            print(p1)
-            f1 = p1(t[range1])
-            range2 = list(range(310000, 370000))
-            z2 = np.polyfit(t[range2], f[range2], 1)
-            p2 = np.poly1d(z2)
-            f2 = p2(t[range2])
-            plt.plot(t, f)
-            plt.plot(t[range1], f1, color='r')
-            plt.plot(t[range2], f2, color='r')
-            plt.xlabel("kT/Ec")
-            plt.ylabel("f")
-            plt.ylim(0, 1)
-            plt.show()
-            print(get_cross(z1, z2))
 
     def loadpolymer(self,filepath):
         T=0
@@ -171,7 +148,7 @@ class pyRoom(Room):
             all_line_txt = file.readline()  # 读所有行
             # print(all_line_txt)
             polymerlist= json.loads(all_line_txt)
-            self.draw(polymerlist,filepath)
+            return self.draw(polymerlist,filepath)
 
     def stepheating(self,start,end,step,EC_max):
         E_list, Ec_list, Ep_list, t_list = [], [], [], []
@@ -230,10 +207,11 @@ def roomtask(Ec0, Ep0, T0):
     return
 
 def drawpictures(Ep,T,k):
-
     r = pyRoom(32, 32, 128, Ec=1, Ep=1, b2a=0)
     #for k in range(0, int(r.shape[2] / 2), 4):
-    r.loadpolymer("chain/chain-%d,%d,%d.json"%(Ep*10,T,k))
+    scence=r.loadpolymer("chain/chain-%d,%d,%d.json"%(Ep*10,T,k))
+    os.system("pause")
+    scence.delete()
 
 
 def ifp1p2(point2,point1):
@@ -255,8 +233,10 @@ def draw(point1,point2):
 
 #
 if __name__ == '__main__':
+    scence = None
     # roomtask(1,1,10)
     drawpictures(2.0,3,32)
+    drawpictures(2.0, 3, 28)
     # return
     # #
     # start = time.time()
