@@ -1,11 +1,10 @@
-import os
+﻿import os
 import time
 from multiprocessing import Pool
 import json
-from vpython import *
 import math
+from vpython import *
 import matplotlib.pyplot as plt
-
 import numpy as np
 from crystal import Room
 
@@ -202,6 +201,7 @@ def roomtask(Ec0, Ep0, T0):
     EC_max = num_of_chains*(chain_length-1)
     # r.py_inputECC(num_of_chains,chain_length)
     r.py_inputECC_with_small()
+    Temperature=5*Ep0+0.5
     for k in range(0, int(r.shape[2]/2), 4):
         r.remove_a_layer(k)
         r.remove_a_layer(k + 2)
@@ -210,8 +210,8 @@ def roomtask(Ec0, Ep0, T0):
         # r.remove_a_layer(k + 8)
         # r.remove_a_layer(k + 10)
         # r.remove_a_layer(k + 12)
-        r.movie(10000,1000,3)
-        r.save("chain-%d,%d,%d.json"%(Ep0*10,3,k))
+        r.movie(5000,1000,Temperature*T0)
+        r.save("chain/chain-%d,%d,%d.json"%(Ep0*10,Temperature*T0*10,k))
         #r.draw()
     # return
     # E_list, Ec_list, Ep_list, t_list,f=r.stepheating(1,8,0.1,EC_max)
@@ -224,8 +224,8 @@ def roomtask(Ec0, Ep0, T0):
     #
     # with open('f%d,%d,%d.json' % (Ec0 * 10, Ep0 * 10, T0 * 10), 'w') as file:
     #     file.write(json.dumps([t_list, f]))
-    # end = time.time()
-    # print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
+    end = time.time()
+    print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
 
     return
 
@@ -256,18 +256,22 @@ def draw(point1,point2):
 #
 if __name__ == '__main__':
     # roomtask(1,1,10)
-    drawpictures(2.0,3,32)
+    #drawpictures(2.0,3,32)
     # return
-    # #
-    # start = time.time()
-    # p = Pool(7)
-    # # # print('Parent process %s.' % os.getpid())
-    # #p = Pool(4)
-    # for i in np.arange(0, 2.2, 0.2):
-    #     p.apply_async(roomtask, args=(1, i, 10))
-    # # # print('Waiting for all subprocesses done...')
-    # p.close()
-    # p.join()
-    # # print('All subprocesses done.')
-    # end = time.time()
-    # print('Tasks runs %0.2f seconds.' % (end - start))
+    start = time.time()
+    p = Pool(12)
+    for i in np.arange(0, 2.2, 0.2):
+        #temperature=(0.4*5+0.5)*0.8*10
+        #drawpictures(0.4, temperature, i)
+        p.apply_async(roomtask, args=(1, i, 0.5))
+         
+        #p.apply_async(drawpictures, args=(2.0, temperature, 10))
+    print('Waiting for all subprocesses done...')
+    p.close()
+    p.join()
+    print('All subprocesses done.')
+    end = time.time()
+    print('Tasks runs %0.2f seconds.' % (end - start))
+    """ for i in np.arange(0, 64, 4):
+        temperature=(1*5+0.5)*0.5*10
+        drawpictures(1, temperature, i) """
