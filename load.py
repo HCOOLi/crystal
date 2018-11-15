@@ -234,7 +234,18 @@ def draw(point1, point2):
 #
 if __name__ == '__main__':
 
+    start = time.time()
+    p = Pool(7)
+    print('Parent process %s.' % os.getpid())
+    # p = Pool(4)
+    # for Ep in np.arange(0,2.1,0.5):
+    for Ep in np.arange(2.0, 10, 1.0):
+        for Eb in np.arange(0, 10, 1.0):
+            p.apply_async(drawpictures,args=(Ep, Eb, 5, 32))
+    print('Waiting for all subprocesses done...')
+    p.close()
+    p.join()
+    print('All subprocesses done.')
+    end = time.time()
+    print('Tasks runs %0.2f seconds.' % (end - start))
     # roomtask(1,1,1,5)
-    for Ep in np.arange(2.0, 2.1, 0.5):
-        for Eb in np.arange(0, 5, 1.0):
-            drawpictures(Ep, Eb, 5, 32)

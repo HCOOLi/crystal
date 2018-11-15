@@ -206,7 +206,6 @@ def roomtask(Ec0, Ep0, Eb0, T0):
 
     return
 
-def drawpictures(Ep,T,k):
 
 def drawpictures(Ep, Eb, T, k):
     r = pyRoom(32, 32, 128, Ec=1, Ep=1, b2a=0)
