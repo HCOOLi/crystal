@@ -7,7 +7,6 @@
 #include"myerror.h"
 #include<boost/python.hpp>
 
-
 namespace py = boost::python;
 
 inline double randfloat() {//generate a random float
@@ -20,8 +19,8 @@ public:
 	int chain_num;
 	int pos_in_chain;
 	int movable;
-	Point *pre = nullptr;
-	Point *next = nullptr;
+	shared_ptr< Point>pre = nullptr;
+	shared_ptr< Point>next = nullptr;
 	vec location;
 
 public:
@@ -41,10 +40,10 @@ ostream & operator<<(ostream & o, Point & p);
 
 class polymer_iter {//of no use
 public:
-	Point * point;
-	polymer_iter(Point * p) :point(p) {}
+	shared_ptr< Point> point;
+	polymer_iter(shared_ptr< Point> p) :point(p) {}
 	Point&operator*() { return *point; }
-	Point* operator->() { return point; }
+	shared_ptr< Point> operator->() { return point; }
 	void operator++(int) {
 		if (point->next == nullptr) {
 			//cout << "nullptr pointer";
@@ -63,7 +62,7 @@ public:
 
 class Polymer {//a polymer 
 public:
-	vector<Point *> chain;
+	vector<shared_ptr< Point>> chain;
 	int length;
 
 	Polymer() {};
@@ -95,8 +94,8 @@ public:
 	Polymer(int l) : length(l) {}
 
 
-	Point *&operator[](int i) { return chain[i]; }
-	Point * operator[](int i) const { return chain[i]; }
+	shared_ptr< Point>&operator[](int i) { return chain[i]; }
+	shared_ptr< Point> operator[](int i) const { return chain[i]; }
 	void construct();
 	py::list get_list()const {
 		py::list a;
@@ -111,19 +110,19 @@ ostream & operator<<(ostream & o, Polymer& p);
 class Grid {
 public:
 	vec shape;
-	vector<vector< vector<Point *> > > lattice;
+	vector<vector< vector<shared_ptr< Point> > > > lattice;
 	//array<array<array< > > > 
 
 	Grid() {};
 
-	Point* & operator[](const vec &P) {
+	shared_ptr< Point>  & operator[](const vec &P) {
 		const static vec b{ 0,0,0 };
 		if (P < b || P >= shape) {
 			throw WrongPoint(__FUNCTION__, P);
 		}
 		return lattice[P[0]][P[1]][P[2]];
 	}
-	Point*  operator[](const vec &P)const {
+	shared_ptr< Point>   operator[](const vec &P)const {
 		const static vec b{ 0,0,0 };
 		if (P<b || P>shape) {
 			throw WrongPoint(__FUNCTION__, P);
@@ -158,17 +157,24 @@ public:
 	const double b2c;
 
 	vector<Polymer> polymer_list;
-	vector<vector<int> > Eb_matrix;
+	vector<vector<double> > Eb_matrix;
 
 	py::list *results;
 
 	//initiate
-	Room(int x, int y, int z, double Ec = 1, double Ep = 1, double b2a = 0, double b2b = 0, double b2c = 0) : lattice(x, y, z), Ec0(Ec), Ep0(Ep), shape(vec{ x,y,z }), b2a(b2a), b2b(b2b), b2c(b2c) {
+	Room(int x, int y, int z, double Ec = 1, double Ep = 1, double b2a = 0, double b2b = 0, double b2c = 0,double Eb=0) : lattice(x, y, z), Ec0(Ec), Ep0(Ep), shape(vec{ x,y,z }), b2a(b2a), b2b(b2b), b2c(b2c) {
+		Eb_matrix.resize(2);
+		Eb_matrix[0].resize(2);
+		Eb_matrix[1].resize(2);
+		Eb_matrix[0][0] = 0;
+		Eb_matrix[0][1] = -Eb;
+		Eb_matrix[1][0] = -Eb;
+		Eb_matrix[1][1] = Eb;
 		results = new py::list();
 		initmoves();
 		srand(1);
 	}
-	Point *set_point(vec location, int chain_num, int pos_in_chain, int movable);
+	shared_ptr< Point>set_point(vec location, int chain_num, int pos_in_chain, int movable);
 	void initmoves();
 
 	//some useful functions
@@ -205,7 +211,6 @@ public:
 			}
 			else {
 				lattice[p->location] = nullptr;
-				delete p;
 				p = nullptr;
 			}
 		}
@@ -224,14 +229,20 @@ public:
 
 	double cal_dEp(deque<vec> &path)const;
 	double cal_dEc(deque<vec> &path)const;
-	double cal_dEb(deque<vec> &path)const;
+	//double cal_dEb(deque<vec> &path)const;
 
 	double cal_dEc_nearby(stack<vec> path)const;
 	double cal_dEp_nearby(stack<vec> path);
-	double cal_dEb_nearby(stack<vec> path)const;
+	double cal_dEb_nearby(stack<vec> path);
 
 	double cal_ifline(vec &p1, vec &p2, vec &p3)const;
-	double cal_Eb_point(vec &p)const;
+
+
+	//double cal_Eb_point(vec & p, vec & p2) const;
+
+	double cal_Eb_point(vec & p, int type) const;
+
+	double cal_Eb_point(vec & p) const;
 
 	double count_parallel_nearby(vec & point1, vec & point2, int i, int j, deque<vec>& que, int cal_type)const;
 	double count_parallel_nearby24(vec & point1, vec & point2, int i, int j, const  deque<vec>& que, int cal_type)const;
@@ -266,11 +277,6 @@ public:
 		return py::object(*results);
 	}
 	~Room() {
-		for (auto &p : polymer_list) {
-			for (auto &chaini : p.chain) {
-				delete chaini;
-			}
-		}
 
 		/*for (int i = 0; i < length; i++) {
 			if (chain[i]) {
