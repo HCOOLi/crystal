@@ -2,14 +2,13 @@
 #include<stack>
 #include<tuple>
 #include<fstream>
+
+
+
 inline bool find_in_que(const deque<vec> &que, vec p) {
-	if (que.empty())
-		return false;
+	if (que.empty()) return false;
 	auto iter = std::find(que.begin(), que.end(), p);
-	if (iter != que.end())
-	{return true;}
-	else
-	{return false;}
+	return iter != que.end()?true:false;
 }
 
 
@@ -170,7 +169,7 @@ void Room::input_stop_chain2() {
 
 
 
-inline Point * Room::set_point(vec location,int chain_num, int pos_in_chain,int movable)
+inline shared_ptr< Point> Room::set_point(vec location,int chain_num, int pos_in_chain,int movable)
 {
 	try {
 		if (lattice[location]) {
@@ -178,7 +177,7 @@ inline Point * Room::set_point(vec location,int chain_num, int pos_in_chain,int 
 			throw string("error");
 			
 		}
-		Point * temp = new Point(location, chain_num, pos_in_chain, movable);
+		shared_ptr< Point> temp (new Point(location, chain_num, pos_in_chain, movable));
 		lattice[location] = temp;
 		return temp;
 	}
@@ -226,7 +225,7 @@ bool Room::intersect(vec & point1, vec & point2)const
 int Room::hasSide(vec & p1, vec & p2) const 
 {
 	try {
-		Point *a = lattice[p1], *b = lattice[p2];
+		shared_ptr< Point> a = lattice[p1], b = lattice[p2];
 		if (a == nullptr || b == nullptr) {
 			return -1;
 		}
@@ -246,7 +245,7 @@ int Room::hasSide(vec & p1, vec & p2) const
 bool Room::canMove(vec & point, vec & direction)const
 {
 	try {
-		Point *p = lattice[point];
+		shared_ptr< Point>p = lattice[point];
 		if (p->movable == 1) {
 			return false;
 		}
@@ -268,7 +267,7 @@ void Room::stepMove(vec & position, vec & next_position, stack<vec>& path)
 	//cout << position << next_position << endl;
 	path.push(position);
 	path.push(next_position);
-	Point *temp = lattice[position];
+	shared_ptr< Point>temp = lattice[position];
 	lattice[position] = nullptr;
 	lattice[next_position] = temp;
 	temp->location = next_position;
@@ -362,10 +361,12 @@ void Room::movie(int m, int n, double T)
 	results = new py::list();
 	py::list Ec_list;
 	py::list Ep_list;
+	py::list Eb_list;
 	py::list E_list;
 	double Ec = cal_Ec()*Ec0;
 	double Ep = cal_Ep()*Ep0;
-	double E = Ec + Ep;
+	double Eb = cal_Eb();
+	double E = Ec + Ep+ Eb;
 	/*double a = cal_Ec() + cal_Ep();*/
 	for (int i = 0; i < m; i++) {
 		for (int j = 0; j < polymer_list.size(); j++) {
@@ -375,13 +376,15 @@ void Room::movie(int m, int n, double T)
 			//double E1 = cal_one_Ep(j);
 			double dEc = cal_dEc_nearby(path)*Ec0;
 			double dEp = cal_dEp_nearby(path)*Ep0;
-			double dE = dEc +dEp;
+			double dEb = cal_dEb_nearby(path);
+			double dE = dEc +dEp+ dEb;
 			//cout << dEp<<endl;
 			if (dE >= 0) {
 				//E = Ec + Ep;
 				E += dE;
 				Ec += dEc;
 				Ep += dEp;
+				Eb += dEb;
 			}
 			else {
 				auto a = randfloat();
@@ -391,6 +394,7 @@ void Room::movie(int m, int n, double T)
 					E += dE;
 					Ec += dEc;
 					Ep += dEp;
+					Eb += dEb;
 					//E = Ec + Ep;
 				}
 				else {
@@ -407,6 +411,7 @@ void Room::movie(int m, int n, double T)
 			E_list.append(E);
 			Ep_list.append(Ep);
 			Ec_list.append(Ec);
+			Eb_list.append(Eb);
 		}
 		else {
 			//cout << i << ',' << n << endl;
@@ -415,9 +420,11 @@ void Room::movie(int m, int n, double T)
 	}
 	cout << "*****Ec=" << Ec << endl;
 	cout << "*****Ep=" << Ep << endl;
+	cout << "*****Eb=" << Eb << endl;
 	cout << "*****E=" << E << endl;
 	results->append(E_list);
 	results->append(Ec_list);
+	results->append(Eb_list);
 	results->append(Ep_list);
 	//cout << "list";
 
@@ -513,6 +520,15 @@ double Room::cal_dEc(deque<vec > &path)const
 	return -num;
 }
 
+//double Room::cal_dEb(deque<vec>& path) const
+//{
+//	double num = 0;
+//	for (auto &point : path) {
+//		num += cal_Eb_point(point);
+//	}
+//	return num;
+//}
+
 double Room::cal_one_Ec(int i)const
 {//has some bugs
 	double num = 0;
@@ -541,8 +557,8 @@ double Room::cal_dEc_nearby(stack<vec> path)const
 	}
 	vec v1 = new_path[0];
 	vec v2 = new_path.back();
-	Point *p1 = lattice[v1];
-	Point *p2 = lattice[v2];
+	shared_ptr< Point>p1 = lattice[v1];
+	shared_ptr< Point>p2 = lattice[v2];
 	int chain_num = p1->chain_num;
 	int length = polymer_list[chain_num].length;
 	if ((p1->pos_in_chain) > (p2->pos_in_chain)) {
@@ -603,8 +619,8 @@ double Room::cal_dEp_nearby(stack<vec> path)
 	}
 	vec v1 = new_path[0];
 	vec v2 = new_path.back();
-	Point *p1 = lattice[v1];
-	Point *p2 = lattice[v2];
+	shared_ptr< Point>p1 = lattice[v1];
+	shared_ptr< Point>p2 = lattice[v2];
 	int chain_num = p1->chain_num;
 	int length = polymer_list[chain_num].length;
 	if (p1->pos_in_chain > p2->pos_in_chain) {
@@ -665,6 +681,86 @@ double Room::cal_dEp_nearby(stack<vec> path)
 
 }
 
+double Room::cal_dEb_nearby(stack<vec> path)
+{
+	if (path.empty()) return 0.0;
+	deque<vec> new_path, old_path;
+
+	stack<vec> do_path(path);
+
+	while (!path.empty()) {
+		vec v1 = path.top();
+		path.pop();
+		vec v2 = path.top();
+		path.pop();
+		//cout << v1 << ',' << v2 << endl;
+		new_path.emplace_back(v1);
+		old_path.emplace_back(v2);
+	}
+	//vec first_point_old = old_path.front();
+	vec first_point_new = new_path.back();
+	//cout << "first_point_new" << first_point_new<<endl;
+	
+	
+	vec	last_point_old = old_path.front();
+	//cout << " last_point_old" << last_point_old << endl;
+	double Eb1 = cal_Eb_point(first_point_new, 2)+ cal_Eb_point(last_point_old,2);
+	stack<vec> re = repair(do_path);
+	double Eb2 = cal_Eb_point(last_point_old, 2)+cal_Eb_point(first_point_new, 2);
+	repair(re);
+	return Eb1 - Eb2;
+	//vec	last_point_new = new_path.back();
+	/*if (first_point_old != last_point_old) {
+		double Eb1= cal_Eb_point(first_point_new, last_point_new) + cal_Eb_point(last_point_new, first_point_new)+
+			cal_Eb_point(first_point_old, last_point_old) + cal_Eb_point(last_point_old, first_point_old);
+		stack<vec> re = repair(do_path);
+		double Eb2 = cal_Eb_point(first_point_new, last_point_new) + cal_Eb_point(last_point_new, first_point_new)+ 
+			cal_Eb_point(first_point_old,last_point_old)+ cal_Eb_point(last_point_old, first_point_old);
+		repair(re);
+		return Eb1 - Eb2;
+	}
+	else {
+		double Eb1 = cal_Eb_point(first_point_new) +cal_Eb_point(first_point_old);
+		stack<vec> re = repair(do_path);
+		double Eb2 = cal_Eb_point(first_point_new) +cal_Eb_point(first_point_old);
+		repair(re);
+		return Eb1 - Eb2;
+	}*/
+
+	/*if(path.empty()) return 0.0;
+	deque<vec> new_path, old_path;
+
+	stack<vec> do_path(path);
+
+	while (!path.empty()) {
+		vec v1 = path.top();
+		path.pop();
+		vec v2 = path.top();
+		path.pop();
+		new_path.emplace_back(v1);
+		old_path.emplace_back(v2);
+	}
+	double dEb1;
+	try {
+		dEb1 = cal_dEb(new_path);
+	}
+	catch (...) {
+		cout << "new_path" << endl;
+		cout << __FUNCTION__ << endl;
+		throw;
+	}
+	stack<vec> re = repair(do_path);
+	double dEb2;
+	try {
+		dEb2 = cal_dEb(old_path);
+	}
+	catch (...) {
+		cout << "old_path";
+	}
+	repair(re);
+	return  dEb1- dEb2;*/
+}
+
 double Room::cal_Ep()const
 {
 	double num = 0;
@@ -690,13 +786,13 @@ double Room::cal_Ep()const
 
 double Room::cal_Eb() const
 {
+	double sum = 0;
 	for (auto &p : polymer_list) {
 		for (auto &point : p.chain) {
-			cal_Eb_point(point->location);
+			sum += cal_Eb_point(point->location);
 		}
-
-}
-	return 0.0;
+	}
+	return sum;
 }
 
 double Room::cal_one_Ep(int i)const
@@ -709,6 +805,11 @@ double Room::cal_one_Ep(int i)const
 			num += count_parallel(polymer_list[i][j - 1]->location, polymer_list[i][j]->location,a,0);
 		}
 		return num;
+}
+
+double Room::cal_one_Eb(int) const
+{
+	return 0.0;
 }
 
 double Room::count_parallel_nearby(vec &point1, vec &point2,
@@ -1012,6 +1113,11 @@ double Room::count_parallel_B(vec &point1, vec &point2, deque<vec> & que, int ca
 }
 
 
+double Room::cal_average_thick() const
+{
+	return 0.0;
+}
+
 double Room::count_parallel_nearby_allB(vec &point1, vec &point2,
 	const deque<vec> & que, int cal_type)const {
 
@@ -1177,18 +1283,52 @@ inline double Room::cal_ifline(vec &p1, vec &p2, vec &p3)const
 	return 1;
 }
 
-double Room::cal_Eb_point(vec & p) const
+double Room::cal_Eb_point(vec & p, int type) const
 
 {
-	vec point;
+	vec point;//some bugs
+	int i, j;
+	i = lattice[p] == nullptr ? 0 : 1;
 	double sum = 0;
 	for (auto &direc : moves) {
 		point = (p + direc) % shape;
-		if (lattice[point] == nullptr) {
-			sum += 0.5;
+		j = lattice[point] == nullptr ? 0 : 1;
+		//cout << i << ',' << j << endl;
+		sum += this->Eb_matrix[i][j];
+		
+	}
+	//cout << "---dEp=" << sum << "---" << endl;
+	return sum;
+
+	//vec point;//some bugs
+	//int i, j;
+	//i = lattice[p] == nullptr ? 0 : 1;
+	//double sum = 0;
+	//for (auto &direc : moves) {
+	//	point = (p + direc) % shape;
+	//	j = lattice[point] == nullptr ? 0 : 1;
+	//	sum += this->Eb_matrix[i][j];
+	//}
+	//return sum;
+}
+double Room::cal_Eb_point(vec & p) const
+
+{
+	vec point;//some bugs
+	int i, j;
+	i = lattice[p] == nullptr ? 0 : 1;
+	double sum = 0;
+	for (auto &direc : moves) {
+		point = (p + direc) % shape;
+		j = lattice[point] == nullptr ? 0 : 1;
+		if(i==1&&j==1)
+			sum += this->Eb_matrix[i][j]/2;
+		else {
+			sum += this->Eb_matrix[i][j];
 		}
 	}
 	return sum;
+	
 }
 
 double Room::cal_PSM() const

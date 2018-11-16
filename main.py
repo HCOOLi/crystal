@@ -2,7 +2,7 @@ import os
 import time
 from multiprocessing import Pool
 import json
-from vpython import *
+# from vpython import *
 import math
 import matplotlib.pyplot as plt
 import os
@@ -11,8 +11,8 @@ import numpy as np
 from crystal import Room
 
 class pyRoom(Room):
-    def __init__(self, a, b, c, Ec=1.0, Ep=1.0,b2a=0.0):
-        Room.__init__(self, a, b, c, Ec, Ep,b2a)
+    def __init__(self, a, b, c, Ec=1.0, Ep=1.0, b2a=0.0, Eb=0.0):
+        Room.__init__(self, a, b, c, Ec, Ep, b2a, 0.0, 0.0, Eb)
         self.shape = np.asarray([a, b, c])
         self.Ec=Ec
         self.Ep=Ep
@@ -167,28 +167,29 @@ class pyRoom(Room):
         return E_list, Ec_list, Ep_list, t_list,f
 
 
-
-def roomtask(Ec0, Ep0, T0):
+def roomtask(Ec0, Ep0, Eb0, T0):
     # try:
     print('Run task %f ,%f,%f(%s)...' % (Ec0, Ep0, T0, os.getpid()))
     start = time.time()
 
-    r = pyRoom(32, 32, 128, Ec=1, Ep=Ep0,b2a=0)
+    r = pyRoom(32, 32, 128, Ec=1, Ep=Ep0, b2a=0, Eb=Eb0)
     num_of_chains=31*31
     chain_length=32
     EC_max = num_of_chains*(chain_length-1)
     # r.py_inputECC(num_of_chains,chain_length)
+    # r.py_inputECC2(16*16,31)
+    #r.draw()
     r.py_inputECC_with_small()
     for k in range(0, int(r.shape[2]/2), 4):
         r.remove_a_layer(k)
         r.remove_a_layer(k + 2)
-        # r.remove_a_layer(k + 4)
-        # r.remove_a_layer(k + 6)
-        # r.remove_a_layer(k + 8)
-        # r.remove_a_layer(k + 10)
-        # r.remove_a_layer(k + 12)
-        r.movie(10000,1000,3)
-        r.save("chain-%d,%d,%d.json"%(Ep0*10,3,k))
+        #     # r.remove_a_layer(k + 4)
+        #     # r.remove_a_layer(k + 6)
+        #     # r.remove_a_layer(k + 8)
+        #     # r.remove_a_layer(k + 10)
+        #     # r.remove_a_layer(k + 12)
+        r.movie(5000, 1000, T0)
+        r.save("chain/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0, k))
         #r.draw()
     # return
     # E_list, Ec_list, Ep_list, t_list,f=r.stepheating(1,8,0.1,EC_max)
@@ -206,10 +207,11 @@ def roomtask(Ec0, Ep0, T0):
 
     return
 
-def drawpictures(Ep,T,k):
+
+def drawpictures(Ep, Eb, T, k):
     r = pyRoom(32, 32, 128, Ec=1, Ep=1, b2a=0)
     #for k in range(0, int(r.shape[2] / 2), 4):
-    scence=r.loadpolymer("chain/chain-%d,%d,%d.json"%(Ep*10,T,k))
+    scence = r.loadpolymer("chain/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
     os.system("pause")
     scence.delete()
 
@@ -218,6 +220,7 @@ def ifp1p2(point2,point1):
     for i in range(3):
         if(abs(point2[i]-point1[i])>1):
             return False
+
     return True
 
 def draw(point1,point2):
@@ -233,21 +236,24 @@ def draw(point1,point2):
 
 #
 if __name__ == '__main__':
-    scence = None
-    # roomtask(1,1,10)
-    drawpictures(2.0,3,32)
-    drawpictures(2.0, 3, 28)
+
+    # roomtask(1,1,1,5)
+    # for k in range(0,64,16):
+    #     drawpictures(1,3,k)
+    #drawpictures(2.0, 3, 28)
     # return
     # #
-    # start = time.time()
-    # p = Pool(7)
-    # # # print('Parent process %s.' % os.getpid())
-    # #p = Pool(4)
-    # for i in np.arange(0, 2.2, 0.2):
-    #     p.apply_async(roomtask, args=(1, i, 10))
-    # # # print('Waiting for all subprocesses done...')
-    # p.close()
-    # p.join()
-    # # print('All subprocesses done.')
-    # end = time.time()
-    # print('Tasks runs %0.2f seconds.' % (end - start))
+    start = time.time()
+    p = Pool(7)
+    print('Parent process %s.' % os.getpid())
+    # p = Pool(4)
+    # for Ep in np.arange(0,2.1,0.5):
+    for Ep in np.arange(2.0, 5.0, 1.0):
+        for Eb in np.arange(0, 4, 1.0):
+            p.apply_async(roomtask, args=(1, Ep, Eb, 5))
+    print('Waiting for all subprocesses done...')
+    p.close()
+    p.join()
+    print('All subprocesses done.')
+    end = time.time()
+    print('Tasks runs %0.2f seconds.' % (end - start))
