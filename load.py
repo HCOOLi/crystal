@@ -10,6 +10,7 @@ import os
 import numpy as np
 from crystal import Room
 
+
 class pyRoom(Room):
     def __init__(self, a, b, c, Ec=1.0, Ep=1.0, b2a=0.0, Eb=0.0):
         Room.__init__(self, a, b, c, Ec, Ep, b2a, 0.0, 0.0, Eb)
@@ -72,11 +73,10 @@ class pyRoom(Room):
                         self.layer[k].append(num)
                         self.py_input_one_ECC([i, j, k + int(self.shape[2] / 4)], 2, 2, 1)
 
-                        num +=1
+                        num += 1
                 else:
                     self.py_input_one_ECC([i, j, int(self.shape[2] / 4)], self.shape[2] / 2, 2, 0)
-                    num +=1
-
+                    num += 1
 
                 pass
 
@@ -142,7 +142,7 @@ class pyRoom(Room):
 
     def loadpolymer(self, filepath):
         T = 0
-        time =1
+        time = 1
         with open(filepath, 'r') as file:
             all_line_txt = file.readline()  # 读所有行
             # print(all_line_txt)
@@ -159,7 +159,7 @@ class pyRoom(Room):
             Ec_list += Ec
             Ep_list += Ep
             t_list += [i] * 200
-            #self.save(i, i*1000)
+            # self.save(i, i*1000)
         f = []
         for i in Ec_list:
             f.append(-i / EC_max)
@@ -177,7 +177,7 @@ def roomtask(Ec0, Ep0, Eb0, T0):
     EC_max = num_of_chains * (chain_length - 1)
     # r.py_inputECC(num_of_chains,chain_length)
     # r.py_inputECC2(16*16,31)
-    #r.draw()
+    # r.draw()
     r.py_inputECC_with_small()
     for k in range(0, int(r.shape[2] / 2), 4):
         r.remove_a_layer(k)
@@ -189,7 +189,7 @@ def roomtask(Ec0, Ep0, Eb0, T0):
         #     # r.remove_a_layer(k + 12)
         r.movie(5000, 1000, T0)
         r.save("chain/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0, k))
-        #r.draw()
+        # r.draw()
     # return
     # E_list, Ec_list, Ep_list, t_list,f=r.stepheating(1,8,0.1,EC_max)
     # fig2 = plt.figure()
@@ -217,14 +217,13 @@ def drawpictures(Ep, Eb, T, k):
 
 def ifp1p2(point2, point1):
     for i in range(3):
-        if (abs(point2[i] - point1[i]) >1):
+        if (abs(point2[i] - point1[i]) > 1):
             return False
 
     return True
 
 
 def draw(point1, point2):
-
     pass
     # with open('f %d,%d,%d.json' % (Ec0 * 10, Ep0 * 10, T0 * 10), 'r') as file:
     #     file.write(json.dumps([t_list, f]))
@@ -234,19 +233,19 @@ def draw(point1, point2):
 
 #
 if __name__ == '__main__':
+
     start = time.time()
     p = Pool(7)
     print('Parent process %s.' % os.getpid())
     # p = Pool(4)
     # for Ep in np.arange(0,2.1,0.5):
-    for Ep in np.arange(2.0, 5.0, 1.0):
-        for Eb in np.arange(3, 6, 1.0):
-            p.apply_async(drawpictures, args=(Ep, Eb, 10, 32))
+    for Ep in np.arange(2.0, 10, 1.0):
+        for Eb in np.arange(0, 10, 1.0):
+            p.apply_async(drawpictures,args=(Ep, Eb, 5, 32))
     print('Waiting for all subprocesses done...')
     p.close()
     p.join()
     print('All subprocesses done.')
     end = time.time()
     print('Tasks runs %0.2f seconds.' % (end - start))
-
-    #roomtask(1,1,1,5)
+    # roomtask(1,1,1,5)
