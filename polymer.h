@@ -2,41 +2,19 @@
 #include<iostream>
 #include"vec.h"
 #include"polymer.h"
+#include"point.h"
 #include<set>
 #include<stack>
 #include"myerror.h"
 #include<boost/python.hpp>
+
 
 namespace py = boost::python;
 
 inline double randfloat() {//generate a random float
 	return rand() / (double)(RAND_MAX);
 }
-class Point //A point class
-{
 
-public:
-	int chain_num;
-	int pos_in_chain;
-	int movable;
-	shared_ptr< Point>pre = nullptr;
-	shared_ptr< Point>next = nullptr;
-	vec location;
-
-public:
-	Point() {}
-	Point(vec loc, int c_num, int p_i_c, int t = 0) :
-		location(loc), chain_num(c_num), pos_in_chain(p_i_c), movable(t) {}
-
-	py::list get_list()const {
-		py::list a;
-		for (int i = 0; i < 3; i++) {
-			a.append(location[i]);
-		}
-		return a;
-	}
-};
-ostream & operator<<(ostream & o, Point & p);
 
 class polymer_iter {//of no use
 public:
@@ -161,6 +139,7 @@ public:
 
 	py::list *results;
 
+
 	//initiate
 	Room(int x, int y, int z, double Ec = 1, double Ep = 1, double b2a = 0, double b2b = 0, double b2c = 0,double Eb=0) : lattice(x, y, z), Ec0(Ec), Ep0(Ep), shape(vec{ x,y,z }), b2a(b2a), b2b(b2b), b2c(b2c) {
 		Eb_matrix.resize(2);
@@ -179,7 +158,7 @@ public:
 
 	//some useful functions
 	bool intersect(vec &point1, vec &point2)const;
-	int hasSide(vec & p1, vec & p2) const;
+	int get_side_num(vec & p1, vec & p2) const;
 	vec cal_direction(const vec & point1, const vec & point2) const;
 
 
@@ -197,6 +176,31 @@ public:
 	void input_one_ECC(vec init, int length, int direction, int movable);
 	void py_input_one_ECC(int x, int y, int z, int length, int direction, int movable);
 	void input_one_circle(vec init, int length, int direction, int movable);
+	void construct_by_pylist(py::list chain_list) {
+		polymer_list.clear();
+		lattice = Grid(shape[0], shape[1], shape[2]);
+		for (int i = 0; i < py::len(chain_list); i++) {
+			py::list chain = py::extract<py::list>(chain_list[i]);
+			Polymer p;
+			p.chain.resize(py::len(chain));
+			p.length = py::len(chain);
+			int chain_num = polymer_list.size();
+			for (int j = 0; j < py::len(chain); j++) {
+				py::list point_in_list = py::extract<py::list>(chain[j]);
+				vec point;
+				for (int k = 0; k < py::len(point_in_list); k++) {
+					int x = py::extract<int>(point_in_list[k]);
+					point[k] = x;
+				}
+				p[j] = set_point(point, chain_num, j, 0);
+
+
+			}
+			p.construct();
+			polymer_list.emplace_back(move(p));
+		}
+
+	}
 
 	//move
 	void stepMove(vec &position, vec &next_position, stack<vec> & path);
@@ -256,7 +260,8 @@ public:
 
 	double count_parallel_nearby_allB(vec & point1, vec & point2, const deque<vec>& que, int cal_type) const;
 
-	double cal_thick(vec &p1, vec &p2)const;
+	py::list cal_thick_by_point()const;
+	
 	double cal_Rg()const;
 	double cal_h2()const;
 	double cal_PSM()const;

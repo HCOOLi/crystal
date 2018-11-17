@@ -11,8 +11,6 @@ inline bool find_in_que(const deque<vec> &que, vec p) {
 	return iter != que.end()?true:false;
 }
 
-
-
 void Room::initmoves()
 {
 	if (dimension == 3) {
@@ -126,8 +124,8 @@ void Room::inputECC(int num, int length)
 	for (int i = 0; i < sqrt_num; i++) {
 		for (int j = 0; j < sqrt_num; j++) {
 			if (i*sqrt_num + j < num) {
-				vec init{ start_point[0] + i,start_point[1],start_point[2] + j };
-				input_one_ECC( init, length,1,0);
+				vec init{ start_point[0] + i,start_point[1] + j,start_point[2]  };
+				input_one_ECC( init, length,2,0);
 			}
 			else {
 				return;
@@ -159,6 +157,7 @@ void Room::input_stop_chain()
 		throw;
 	}
 }
+
 void Room::input_stop_chain2() {
 	for (int i = 0; i < shape[0]; i++) {
 		vec init = { 0,i,0 };
@@ -199,30 +198,30 @@ bool Room::intersect(vec & point1, vec & point2)const
 		vec p4{ point1[0], point2[1], point2[2] };
 		vec p5{ point1[0], point1[1], point2[2] };
 		vec p6{ point2[0], point1[1], point2[2] };
-		return hasSide(p1, p4) || hasSide(p2, p5) || hasSide(p3, p6);
+		return get_side_num(p1, p4)!=-1 || get_side_num(p2, p5) != -1 || get_side_num(p3, p6) != -1;
 	}
 	else if (direction*direction == 2) {
 		if (point1[0] == point2[0]) {
 			vec p1{ point1[0], point2[1], point1[2] };
 			vec p2{ point2[0], point1[1], point2[2] };
-			return hasSide(p1, p2);
+			return get_side_num(p1, p2) != -1;
 		}
 		else if (point1[1] == point2[1]) {
 			vec p1{ point2[0], point1[1], point1[2] };
 			vec p2{ point1[0], point2[1], point2[2] };
-			return hasSide(p1, p2);
+			return get_side_num(p1, p2) != -1;
 		}
 		else if (point1[2] == point2[2]) {
 			vec p1{ point2[0], point1[1], point1[2] };
 			vec p2{ point1[0], point2[1], point2[2] };
-			return hasSide(p1, p2);
+			return get_side_num(p1, p2) != -1;
 		}
 	}
 	return false;
 
 }
 
-int Room::hasSide(vec & p1, vec & p2) const 
+int Room::get_side_num(vec & p1, vec & p2) const 
 {
 	try {
 		shared_ptr< Point> a = lattice[p1], b = lattice[p2];
@@ -825,7 +824,7 @@ double Room::count_parallel_nearby(vec &point1, vec &point2,
 	p2[i] = (p2[i] + 1) % shape[i];
 	int result;
 	
-	result = hasSide(p1, p2);
+	result = get_side_num(p1, p2);
 	if (result == -1) {;}
 	else {
 		if (result == chain_num) {
@@ -842,7 +841,7 @@ double Room::count_parallel_nearby(vec &point1, vec &point2,
 	}
 	p1[i] = (p1[i] + shape[i] - 2) % shape[i];
 	p2[i] = (p2[i] + shape[i] - 2) % shape[i];
-	 result = hasSide(p1, p2);
+	 result = get_side_num(p1, p2);
 	if (result == -1) { ; }
 	else {
 		if (result == chain_num) {
@@ -859,7 +858,7 @@ double Room::count_parallel_nearby(vec &point1, vec &point2,
 	}
 	p3[j] = (p3[j] + 1) % shape[j];
 	p4[j] = (p4[j] + 1) % shape[j];
-	 result = hasSide(p3, p4);
+	 result = get_side_num(p3, p4);
 	if (result == -1) { ; }
 	else {
 		if (result == chain_num) {
@@ -876,7 +875,7 @@ double Room::count_parallel_nearby(vec &point1, vec &point2,
 	}
 	p3[j] = (p3[j] + shape[j] - 2) % shape[j];
 	p4[j] = (p4[j] + shape[j] - 2) % shape[j];
-	  result = hasSide(p3, p4);
+	  result = get_side_num(p3, p4);
 	if (result == -1) { ; }
 	else {
 		if (result == chain_num) {
@@ -921,7 +920,7 @@ double Room::count_parallel_nearby8(vec &point1, vec &point2,
 			p1[j] = (point1[j] + shape[j] + y) % shape[j];
 			p2[j] = (point2[j] + shape[j] + y) % shape[j];
 			int result;
-			result = hasSide(p1, p2);
+			result = get_side_num(p1, p2);
 			if (result == -1) { ; }
 			else {
 				if (result == chain_num) {
@@ -973,7 +972,7 @@ double Room::count_parallel_nearby24(vec &point1, vec &point2,
 				p2[j] = (point2[j] + shape[j] + y) % shape[j];
 				p1[k] = (point1[k] + shape[k] + z) % shape[k];
 				p2[k] = (point2[k] + shape[k] + z) % shape[k];
-				int result= hasSide(p1, p2);
+				int result= get_side_num(p1, p2);
 				if (result == -1) { continue; }
 				else {
 					if (result == chain_num) {
@@ -1021,7 +1020,7 @@ double Room::count_parallel_nearby_all(vec &point1, vec &point2,
 		}
 		p1 = (point1 + direc) % shape;
 		p2 = (point2 + direc) % shape;
-		int result = hasSide(p1, p2);
+		int result = get_side_num(p1, p2);
 		if (result == -1) { continue; }
 		else {
 			if (result == chain_num) {
@@ -1137,7 +1136,7 @@ double Room::count_parallel_nearby_allB(vec &point1, vec &point2,
 		for (int i = 0; i < 5; i++) {
 			p1 = (point1 + i*direc) % shape;
 			p2 = (point2 + i*direc) % shape;
-			int result = hasSide(p1, p2);
+			int result = get_side_num(p1, p2);
 			if (result == -1) { break; }
 			else {
 				if (result == chain_num) {
@@ -1168,74 +1167,95 @@ double Room::count_parallel_nearby_allB(vec &point1, vec &point2,
 }
 
 
-double Room::cal_thick(vec &p1, vec &p2)const//计算厚度
+py::list Room::cal_thick_by_point()const//计算厚度
 {
-	/*
-		 if self.dimension==2:
-			thickx = 0
-			thicky = 0
-			widthx=0
-			widthy=0
-			if p1[0] == p2[0]:
+	py::list thicka, thickb, thickc;
+	py::list *thickness = new py::list;
+	//cout << "calthickness" << endl;
+	vec point1{ 0,0,0 }, point2{ 0,0,1 };
+	for (int k = 0; k < shape[2] - 1; k++) {
+		for (int i = 0; i < shape[0]; i++) {
+			int th_a = 0;
+			for (int j = 0; j < shape[1]; j++) {
 
-				p3 = p1.copy()
-				p4 = p2.copy()
-				for i in range(1, self.shape[0]):
-					p3[0] = (p1[0] + i) % self.shape[0]
-					p4[0] = (p2[0] + i) % self.shape[0]
-					if self.hasSide(p3, p4):
-						pass
-					else:
-						thickx=i-1
-						break
-				p5 = p1.copy()
-				p6 = p2.copy()
-				p3[0] = (p1[0] + 1) % self.shape[0]
-				p4[0] = (p2[0] + 1) % self.shape[0]
-				if self.hasSide(p3, p4):
-					for i in range(1, self.shape[0]):
-						p3[1] = (p1[1] + i) % self.shape[1]
-						p4[1] = (p2[1] + i) % self.shape[1]
-						p5[1] = (p1[1] + i) % self.shape[1]
-						p6[1] = (p2[1] + i) % self.shape[1]
-						if self.hasSide(p3, p4) and self.hasSide(p5, p6):
-							pass
-						else:
-							widthx=i-1
-							break
-			elif p1[1] == p2[1]:
+				point1[0] = i; point2[0] = i;
+				point1[1] = j; point2[1] = j;
+				point1[2] = k; point2[2] = k + 1;
+				if(this->get_side_num(point1, point2) != -1)
+					th_a++;
+				else {
+					if (th_a != 0) {
+						thicka.append(th_a);
+						th_a = 0;
+					}
 
-				# mylog.debug("y")
-				p3 = p1.copy()
-				p4 = p2.copy()
-				for i in range(1, self.shape[1]):
-					p3[1] = (p1[1] + i) % self.shape[1]
-					p4[1] = (p2[1] + i) % self.shape[1]
-					if self.hasSide(p3, p4):
-						pass
-					else:
-						thicky =i-1
-						break
-				p5 = p1.copy()
-				p6 = p2.copy()
-				p3[1] = (p1[1] + 1) % self.shape[1]
-				p4[1] = (p2[1] + 1) % self.shape[1]
-				if self.hasSide(p3, p4):
-					for i in range(1, self.shape[1]):
-						p3[0] = (p1[0] + i) % self.shape[0]
-						p4[0] = (p2[0] + i) % self.shape[0]
-						p5[0] = (p1[0] + i) % self.shape[0]
-						p6[0] = (p2[0] + i) % self.shape[0]
-						if self.hasSide(p3, p4) and self.hasSide(p5, p6):
-							pass
-						else:
-							widthy=i-1
-							break
-			return max(thickx,thicky),max(widthx,widthy)
-		else :
-			return  0,0
-		*/
-	return 0.0;
+				}
+
+			}
+			if (th_a != 0) {
+				/*if (th_a == 1) {
+					cout << point1 << ',' << point2<<endl;
+				}*/
+				thicka.append(th_a);
+				//cout << th_a;
+				th_a = 0;
+			}
+		}
+	}
+	for (int k = 0; k < shape[2] - 1; k++) {
+		for (int j = 0; j < shape[1]; j++) {
+			int th_b = 0;
+			for (int i = 0; i < shape[0]; i++) {
+				point1[0] = i; point2[0] = i;
+				point1[1] = j; point2[1] = j;
+				point1[2] = k; point2[2] = k + 1;
+				if (this->get_side_num(point1, point2) != -1)
+					th_b++;
+				else {
+					if (th_b != 0) {
+						thickb.append(th_b);
+						//cout << th_b;
+						th_b = 0;
+					}
+				}
+			}
+			if (th_b != 0) {
+				thickb.append(th_b);
+				th_b = 0;
+			}
+		}
+	}
+	for (int j = 0; j < shape[1]; j++) {
+		for (int i = 0; i < shape[0]; i++) {
+			int th_c = 0;
+			for (int k = 0; k < shape[2] - 1; k++) {
+			point1[0] = i; point2[0] = i;
+			point1[1] = j; point2[1] = j;
+			point1[2] = k; point2[2] = k + 1;
+			if (this->get_side_num(point1, point2) != -1)
+				th_c++;
+			else {
+				if (th_c != 0) {
+					//cout << th_c;
+					thickc.append(th_c);
+					//cout << th_c;
+					th_c = 0;
+				}
+			}
+		}
+		if (th_c != 0) {
+			thickc.append(th_c);
+			th_c = 0;
+		}
+	}
+}
+
+	thickness->append(thicka);
+	thickness->append(thickb);
+	thickness->append(thickc);
+
+
+	return *thickness;
 }
 
 double Room::cal_Rg()const// 均方旋转半径
