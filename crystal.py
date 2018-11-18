@@ -31,21 +31,5 @@ class Room():
 
     def get_result(self):
         pass
-        '''
 
-
-            def("input_stop_chain", & Room::input_stop_chain):
-
-
-
-            def("input_stop_chain2", & Room::input_stop_chain2):
-
-
-
-
-
-
-
-            
-            '''
     pass
