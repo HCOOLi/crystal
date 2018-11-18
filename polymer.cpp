@@ -1193,9 +1193,10 @@ py::list Room::cal_thick_by_point()const//计算厚度
 
 			}
 			if (th_a != 0) {
-				/*if (th_a == 1) {
-					cout << point1 << ',' << point2<<endl;
-				}*/
+				if (th_a == 1) {
+					th_a = 0;
+					continue;
+				}
 				thicka.append(th_a);
 				//cout << th_a;
 				th_a = 0;
@@ -1212,6 +1213,10 @@ py::list Room::cal_thick_by_point()const//计算厚度
 				if (this->get_side_num(point1, point2) != -1)
 					th_b++;
 				else {
+					if (th_b == 1) {
+						th_b = 0;
+						continue;
+					}
 					if (th_b != 0) {
 						thickb.append(th_b);
 						//cout << th_b;
@@ -1235,6 +1240,10 @@ py::list Room::cal_thick_by_point()const//计算厚度
 			if (this->get_side_num(point1, point2) != -1)
 				th_c++;
 			else {
+				if (th_c == 1) {
+					th_c = 0;
+					continue;
+				}
 				if (th_c != 0) {
 					//cout << th_c;
 					thickc.append(th_c);
