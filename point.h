@@ -2,6 +2,7 @@
 #include<iostream>
 #include"vec.h"
 #include<boost/python.hpp>
+namespace py = boost::python;
 class Point //A point class
 {
 
