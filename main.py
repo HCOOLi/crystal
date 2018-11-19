@@ -2,7 +2,6 @@ import os
 import time
 from multiprocessing import Pool
 import json
-# from vpython import *
 import math
 import matplotlib.pyplot as plt
 import os
@@ -174,25 +173,40 @@ def roomtask(Ec0, Ep0, Eb0, T0):
     print('Run task %f ,%f,%f(%s)...' % (Ec0, Ep0, T0, os.getpid()))
     start = time.time()
 
-    r = pyRoom(32, 32, 128, Ec=1, Ep=Ep0, b2a=0, Eb=Eb0)
-    num_of_chains=31*31
-    chain_length=32
+    r0 = pyRoom(32, 64, 32, Ec=1, Ep=3, b2a=0, Eb=3)
+    num_of_chains = 16 * 16
+    chain_length = 64
     EC_max = num_of_chains*(chain_length-1)
-    # r.py_inputECC(num_of_chains,chain_length)
+    r0.py_inputECC(num_of_chains, chain_length)
+    print(r0.cal_Ep())
+
+    r = pyRoom(32, 32, 128, Ec=1, Ep=3, b2a=0, Eb=3)
+
     # r.py_inputECC2(16*16,31)
     #r.draw()
-    r.py_inputECC_with_small()
-    for k in range(0, int(r.shape[2]/2), 4):
-        r.remove_a_layer(k)
-        r.remove_a_layer(k + 2)
-        #     # r.remove_a_layer(k + 4)
-        #     # r.remove_a_layer(k + 6)
-        #     # r.remove_a_layer(k + 8)
-        #     # r.remove_a_layer(k + 10)
-        #     # r.remove_a_layer(k + 12)
-        r.movie(5000, 1000, T0)
-        r.save("chain/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0, k))
-        #r.draw()
+    # r.py_inputECC_with_small()
+
+    r.construct_by_pylist(r.loadpolymer("chain/chain-%d,%d,%d,%d.json" % (3 * 10, 3 * 10, 10, 60)))
+    r.movie(1000, 1000, 10)
+    r.draw()
+    thicka, thickb, thickc = r.cal_thick_by_point()
+    r
+    print(r.cal_Ep())
+    print(r.cal_Ec() / EC_max)
+    # print(thicka),print(thickb),print(thickc)
+    plt.hist(thickc)
+    plt.show()
+    # for k in range(0, int(r.shape[2]/2), 4):
+    #     r.remove_a_layer(k)
+    #     r.remove_a_layer(k + 2)
+    # #     # r.remove_a_layer(k + 4)
+    # #     # r.remove_a_layer(k + 6)
+    # #     # r.remove_a_layer(k + 8)
+    # #     # r.remove_a_layer(k + 10)
+    # #     # r.remove_a_layer(k + 12)
+    #     r.movie(5000,1000,T0)
+    #     r.save("chain/chain-%d,%d,%d,%d.json"%(Ep0*10,Eb0*10,T0,k))
+    #     #r.draw()
     # return
     # E_list, Ec_list, Ep_list, t_list,f=r.stepheating(1,8,0.1,EC_max)
     # fig2 = plt.figure()
@@ -241,24 +255,23 @@ def draw(point1,point2):
 
 #
 if __name__ == '__main__':
-
-    # roomtask(1,1,1,5)
+    roomtask(1, 1, 1,5)
     # for k in range(0,64,16):
     #     drawpictures(1,3,k)
     #drawpictures(2.0, 3, 28)
     # return
     # #
-    start = time.time()
-    p = Pool(7)
-    print('Parent process %s.' % os.getpid())
-    # p = Pool(4)
-    # for Ep in np.arange(0,2.1,0.5):
-    for Ep in np.arange(2.0, 5.0, 1.0):
-        for Eb in np.arange(0, 4, 1.0):
-            p.apply_async(roomtask, args=(1, Ep, Eb, 5))
-    print('Waiting for all subprocesses done...')
-    p.close()
-    p.join()
-    print('All subprocesses done.')
-    end = time.time()
-    print('Tasks runs %0.2f seconds.' % (end - start))
+    # start = time.time()
+    # p = Pool(7)
+    # print('Parent process %s.' % os.getpid())
+    # #p = Pool(4)
+    # #for Ep in np.arange(0,2.1,0.5):
+    # for Ep in np.arange(2.0, 5.0, 1.0):
+    #     for Eb in np.arange(3, 6, 1.0):
+    #         p.apply_async(roomtask, args=(1, Ep,Eb, 10))
+    # print('Waiting for all subprocesses done...')
+    # p.close()
+    # p.join()
+    # print('All subprocesses done.')
+    # end = time.time()
+    # print('Tasks runs %0.2f seconds.' % (end - start))
