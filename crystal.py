@@ -8,13 +8,25 @@ class Room():
     def get_list(self):
         pass
 
-    def input_one_ECC(self, x, y, z, length, direction, ty):
-        pass
-
     def inputECC(self, num, length):
         pass
 
     def input_one_ECC(self, x, y, z, length, direction, movable):
+        pass
+
+    def get_result(self):
+        pass
+
+    def movie(self):
+        pass
+
+    def delete_chain(self):
+        pass
+
+    def cal_Ec(self):
+        pass
+
+    def cal_Ep(self):
         pass
 
     def get_result(self):
@@ -30,23 +42,10 @@ class Room():
 
 
 
-            def("movie", & Room::movie):
-
-
-
-            def("delete_chain", & Room::deletechain):
 
 
 
 
-            def("cal_Ec", & Room::cal_Ec):
-
-
-
-            def("cal_Ep", & Room::cal_Ep):
-
-
-
-            def("get_result", & Room::get_result):
+            
             '''
     pass
