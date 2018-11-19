@@ -1,11 +1,9 @@
 
-
-
 import json
 import math
 import matplotlib.pyplot as plt
 import os
-
+import time
 import numpy as np
 from crystal import Room
 
@@ -171,14 +169,14 @@ class pyRoom(Room):
 
         return True
 
-def reconstruct():
+def reconstruct(Ep, Eb, T, k):
     r = pyRoom(32, 32, 128, Ec=1, Ep=3, b2a=0, Eb=3)
 
     # r.py_inputECC2(16*16,31)
     # r.draw()
     # r.py_inputECC_with_small()
 
-    r.construct_by_pylist(r.load_polymer("chain/chain-%d,%d,%d,%d.json" % (4 * 10, 10, 16, 60)))
+    r.construct_by_pylist(r.load_polymer("chain/chain-%d,%d,%d,%d.json" % (Ep*10, Eb*10, T, k)))
     r.draw()
     thicka, thickb, thickc = r.cal_thick_by_point()
     r
@@ -251,41 +249,26 @@ def room_task(Ec0, Ep0, Eb0, T0):
 
 def washing_small(Ec0, Ep0, Eb0, T0):
     # try:
-    print('Run task %f ,%f,%f(%s)...' % (Ec0, Ep0, T0, os.getpid()))
+    print('Run task %f ,%f,%f(%s)...' % (Ep0, Eb0, T0, os.getpid()))
     start = time.time()
 
-    r0 = pyRoom(32, 64, 32, Ec=1, Ep=3, b2a=0, Eb=3)
-    num_of_chains = 16 * 16
-    chain_length = 64
-    EC_max = num_of_chains * (chain_length - 1)
-    r0.py_inputECC(num_of_chains, chain_length)
-    print(r0.cal_Ep())
+    r = pyRoom(32, 32, 128, Ec=Ec0, Ep=Ep0, b2a=0, Eb=Eb0)
+    EC_max = 16*16 * (64 - 1)
+    r.py_inputECC_with_small()
 
+    for k in range(0, int(r.shape[2]/2), 4):
+        r.remove_a_layer(k)
+        r.remove_a_layer(k + 2)
+    #     # r.remove_a_layer(k + 4)
+    #     # r.remove_a_layer(k + 6)
+    #     # r.remove_a_layer(k + 8)
+    #     # r.remove_a_layer(k + 10)
+    #     # r.remove_a_layer(k + 12)
+        r.movie(20000, 2000, T0)
+        r.save("chain/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0, k))
 
-    # for k in range(0, int(r.shape[2]/2), 4):
-    #     r.remove_a_layer(k)
-    #     r.remove_a_layer(k + 2)
-    # #     # r.remove_a_layer(k + 4)
-    # #     # r.remove_a_layer(k + 6)
-    # #     # r.remove_a_layer(k + 8)
-    # #     # r.remove_a_layer(k + 10)
-    # #     # r.remove_a_layer(k + 12)
-    #     r.movie(5000,1000,T0)
-    #     r.save("chain/chain-%d,%d,%d,%d.json"%(Ep0*10,Eb0*10,T0,k))
-    #     #r.draw()
-    # return
-    # E_list, Ec_list, Ep_list, t_list,f=r.stepheating(1,8,0.1,EC_max)
-    # fig2 = plt.figure()
-    #
-    # plt.plot(t_list,f)
-    # #r.draw()
-    # plt.savefig('f%d,%d,%d.png' % (Ec0 * 10, Ep0 * 10, T0 * 10))
-    # plt.show()
-    #
-    # with open('f%d,%d,%d.json' % (Ec0 * 10, Ep0 * 10, T0 * 10), 'w') as file:
-    #     file.write(json.dumps([t_list, f]))
-    # end = time.time()
-    # print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
+    end = time.time()
+    print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
 
     return
 
