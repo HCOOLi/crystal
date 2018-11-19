@@ -18,6 +18,7 @@ BOOST_PYTHON_MODULE(crystal)
 		.def("get_list",&Room::get_list)
 		.def("cal_Ec",&Room::cal_Ec)
 		.def("cal_Ep",&Room::cal_Ep)
+		.def("ca_Eb",&Room::cal_Eb)
 		.def("get_result",&Room::get_result)
 		;
 }
