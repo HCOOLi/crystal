@@ -169,26 +169,37 @@ class pyRoom(Room):
 
         return True
 
+
 def reconstruct(Ep, Eb, T, k):
-    r = pyRoom(32, 32, 128, Ec=1, Ep=3, b2a=0, Eb=3)
+    r0 = pyRoom(32, 64, 32, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
+    num_of_chains = 16 * 16
+    chain_length = 64
+    EC_max = num_of_chains * (chain_length - 1)
+    r0.py_inputECC(num_of_chains, chain_length)
+    Ep0 = r0.cal_Ep()
 
-    # r.py_inputECC2(16*16,31)
-    # r.draw()
-    # r.py_inputECC_with_small()
-
-    r.construct_by_pylist(r.load_polymer("chain/chain-%d,%d,%d,%d.json" % (Ep*10, Eb*10, T, k)))
-    r.draw()
+    r = pyRoom(32, 32, 128, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
+    r.construct_by_pylist(r.load_polymer("chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k)))
+    r.draw(path="chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
     thicka, thickb, thickc = r.cal_thick_by_point()
-    r
-    print(r.cal_Ep())
-    print(r.cal_Ec())
-    # print(thicka),print(thickb),print(thickc)
+
+    print(r.cal_Ep() / Ep0)
+    print(r.cal_Ec() / EC_max)
+    plt.title('a')
     plt.hist(thicka)
     plt.show()
+    plt.title('b')
     plt.hist(thickb)
     plt.show()
+    plt.title('c')
     plt.hist(thickc)
     plt.show()
+    os.system("pause")
+    return
+
+
+
+
 
 
 
@@ -206,44 +217,15 @@ def room_task(Ec0, Ep0, Eb0, T0):
 
     r = pyRoom(32, 32, 128, Ec=1, Ep=3, b2a=0, Eb=3)
 
-    # r.py_inputECC2(16*16,31)
-    # r.draw()
-    # r.py_inputECC_with_small()
-
     r.construct_by_pylist(r.load_polymer("chain/chain-%d,%d,%d,%d.json" % (3 * 10, 10, 12, 60)))
     r.draw()
     thicka, thickb, thickc = r.cal_thick_by_point()
-    r
+
     print(r.cal_Ep())
     print(r.cal_Ec() / EC_max)
     # print(thicka),print(thickb),print(thickc)
     plt.hist(thickc)
     plt.show()
-    # for k in range(0, int(r.shape[2]/2), 4):
-    #     r.remove_a_layer(k)
-    #     r.remove_a_layer(k + 2)
-    # #     # r.remove_a_layer(k + 4)
-    # #     # r.remove_a_layer(k + 6)
-    # #     # r.remove_a_layer(k + 8)
-    # #     # r.remove_a_layer(k + 10)
-    # #     # r.remove_a_layer(k + 12)
-    #     r.movie(5000,1000,T0)
-    #     r.save("chain/chain-%d,%d,%d,%d.json"%(Ep0*10,Eb0*10,T0,k))
-    #     #r.draw()
-    # return
-    # E_list, Ec_list, Ep_list, t_list,f=r.stepheating(1,8,0.1,EC_max)
-    # fig2 = plt.figure()
-    #
-    # plt.plot(t_list,f)
-    # #r.draw()
-    # plt.savefig('f%d,%d,%d.png' % (Ec0 * 10, Ep0 * 10, T0 * 10))
-    # plt.show()
-    #
-    # with open('f%d,%d,%d.json' % (Ec0 * 10, Ep0 * 10, T0 * 10), 'w') as file:
-    #     file.write(json.dumps([t_list, f]))
-    # end = time.time()
-    # print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
-
     return
 
 

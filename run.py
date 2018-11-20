@@ -17,6 +17,21 @@ def tuning_washing_small():
     end = time.time()
     print('Tasks runs %0.2f seconds.' % (end - start))
 
+
+def reconstructs():
+    start = time.time()
+    p = Pool(1)
+    print('Parent process %s.' % os.getpid())
+    for Ep in np.arange(2.0, 6.0, 1.0):
+        for Eb in np.arange(0, 2.1, 0.2):
+            p.apply_async(reconstruct, args=(Ep, Eb, Ep * 3, 60))
+    print('Waiting for all subprocesses done...')
+    p.close()
+    p.join()
+    print('All subprocesses done.')
+    end = time.time()
+    print('Tasks runs %0.2f seconds.' % (end - start))
+
 def draw_pictures():
     start = time.time()
     p = Pool(2)
@@ -48,7 +63,6 @@ def tuning_step_heating():
     print('Tasks runs %0.2f seconds.' % (end - start))
 
 if __name__ == '__main__':
-
+    reconstructs()
     # washing_small(1, 3, 1, 3 * 4)
-    tuning_washing_small()
-
+    # tuning_washing_small()
