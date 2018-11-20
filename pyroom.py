@@ -183,8 +183,8 @@ def reconstruct(Ep, Eb, T, k):
     r.draw(path="chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
     thicka, thickb, thickc = r.cal_thick_by_point()
 
-    print(r.cal_Ep() / Ep0)
-    print(r.cal_Ec() / EC_max)
+    print("结晶度：%3.1f%%" % (r.cal_Ep() / Ep0 * 100))
+    print("f=%0.3f" % (r.cal_Ec() / EC_max))
     plt.title('a')
     plt.hist(thicka)
     plt.show()
