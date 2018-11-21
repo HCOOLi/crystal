@@ -60,14 +60,24 @@ class pyRoom(Room):
         # vec
         start_point = [0, 0, 0]
         num = 0
-        self.layer = {}
+        self.a_layer = {}
+        self.b_layer = {}
+        self.c_layer = {}
+
         for k in range(0, int(self.shape[2] / 2), 2):
-            self.layer[k] = []
+            self.c_layer[k] = []
+        for i in range(0, int(self.shape[0])):
+            self.a_layer[i] = []
+        for j in range(0, int(self.shape[1])):
+            self.b_layer[j] = []
+
         for i in range(self.shape[0]):
             for j in range(self.shape[1]):
                 if j % 2 == 0 or i % 2 == 0:
                     for k in range(0, int(self.shape[2] / 2), 2):
-                        self.layer[k].append(num)
+                        self.a_layer[i].append(num)
+                        self.b_layer[j].append(num)
+                        self.c_layer[k].append(num)
                         self.py_input_one_ECC([i, j, k + int(self.shape[2] / 4)], 2, 2, 1)
 
                         num += 1
@@ -77,8 +87,20 @@ class pyRoom(Room):
 
                 pass
 
+    def remove_c_layer(self, k):
+        for i in self.c_layer[k]:
+            self.delete_chain(i)
+
     def remove_a_layer(self, k):
-        for i in self.layer[k]:
+        if k >= self.shape[0]:
+            return
+        for i in self.a_layer[k]:
+            self.delete_chain(i)
+
+    def remove_b_layer(self, k):
+        if k >= self.shape[1]:
+            return
+        for i in self.b_layer[k]:
             self.delete_chain(i)
 
     def save(self, file_path):
@@ -179,21 +201,21 @@ def reconstruct(Ep, Eb, T, k):
     Ep0 = r0.cal_Ep()
 
     r = pyRoom(32, 32, 128, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
-    r.construct_by_pylist(r.load_polymer("chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k)))
-    r.draw(path="chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
-    thicka, thickb, thickc = r.cal_thick_by_point()
-
-    print("结晶度：%3.1f%%" % (r.cal_Ep() / Ep0 * 100))
-    print("f=%0.3f" % (r.cal_Ec() / EC_max))
-    plt.title('a')
-    plt.hist(thicka)
-    plt.show()
-    plt.title('b')
-    plt.hist(thickb)
-    plt.show()
-    plt.title('c')
-    plt.hist(thickc)
-    plt.show()
+    r.construct_by_pylist(r.load_polymer("chain8/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T * 10, k)))
+    r.draw(path="chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T * 10, k))
+    # thicka, thickb, thickc = r.cal_thick_by_point()
+    #
+    # print("结晶度：%3.1f%%" % (r.cal_Ep() / Ep0 * 100))
+    # print("f=%0.3f" % (r.cal_Ec() / EC_max))
+    # plt.title('a')
+    # plt.hist(thicka)
+    # plt.show()
+    # plt.title('b')
+    # plt.hist(thickb)
+    # plt.show()
+    # plt.title('c')
+    # plt.hist(thickc)
+    # plt.show()
     os.system("pause")
     return
 
@@ -230,7 +252,6 @@ def room_task(Ec0, Ep0, Eb0, T0):
 
 
 def washing_small(Ec0, Ep0, Eb0, T0):
-    # try:
     print('Run task %f ,%f,%f(%s)...' % (Ep0, Eb0, T0, os.getpid()))
     start = time.time()
 
@@ -239,15 +260,45 @@ def washing_small(Ec0, Ep0, Eb0, T0):
     r.py_inputECC_with_small()
 
     for k in range(0, int(r.shape[2]/2), 4):
-        r.remove_a_layer(k)
-        r.remove_a_layer(k + 2)
-    #     # r.remove_a_layer(k + 4)
-    #     # r.remove_a_layer(k + 6)
-    #     # r.remove_a_layer(k + 8)
-    #     # r.remove_a_layer(k + 10)
-    #     # r.remove_a_layer(k + 12)
+        r.remove_c_layer(k)
+        r.remove_c_layer(k + 2)
+        #     # r.remove_c_layer(k + 4)
+        #     # r.remove_c_layer(k + 6)
+        #     # r.remove_c_layer(k + 8)
+        #     # r.remove_c_layer(k + 10)
+        #     # r.remove_c_layer(k + 12)
         r.movie(20000, 2000, T0)
         r.save("chain/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0, k))
+
+    end = time.time()
+    print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
+
+    return
+
+
+def washing_small_a_b(Ec0, Ep0, Eb0, T0):
+    # try:
+    print('Run task %f ,%f,%f(%s)...' % (Ep0, Eb0, T0, os.getpid()))
+    start = time.time()
+
+    r = pyRoom(32, 32, 128, Ec=Ec0, Ep=Ep0, b2a=0, Eb=Eb0)
+    EC_max = 16 * 16 * (64 - 1)
+    r.py_inputECC_with_small()
+
+    for k in range(0, int(r.shape[2] / 2), 2):
+        r.remove_a_layer(k)
+        r.remove_a_layer(k + 1)
+        r.remove_b_layer(k)
+        r.remove_b_layer(k + 1)
+        # r.remove_c_layer(k)
+        # r.remove_c_layer(k + 2)
+        #     # r.remove_c_layer(k + 4)
+        #     # r.remove_c_layer(k + 6)
+        #     # r.remove_c_layer(k + 8)
+        #     # r.remove_c_layer(k + 10)
+        #     # r.remove_c_layer(k + 12)
+        r.movie(20000, 20000, T0)
+        r.save("chain/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0 * 10, k))
 
     end = time.time()
     print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
@@ -283,13 +334,13 @@ def step_heating(Ec0, Ep0, Eb0, T0):
     plt.hist(thickc)
     plt.show()
     # for k in range(0, int(r.shape[2]/2), 4):
-    #     r.remove_a_layer(k)
-    #     r.remove_a_layer(k + 2)
-    # #     # r.remove_a_layer(k + 4)
-    # #     # r.remove_a_layer(k + 6)
-    # #     # r.remove_a_layer(k + 8)
-    # #     # r.remove_a_layer(k + 10)
-    # #     # r.remove_a_layer(k + 12)
+    #     r.remove_c_layer(k)
+    #     r.remove_c_layer(k + 2)
+    # #     # r.remove_c_layer(k + 4)
+    # #     # r.remove_c_layer(k + 6)
+    # #     # r.remove_c_layer(k + 8)
+    # #     # r.remove_c_layer(k + 10)
+    # #     # r.remove_c_layer(k + 12)
     #     r.movie(5000,1000,T0)
     #     r.save("chain/chain-%d,%d,%d,%d.json"%(Ep0*10,Eb0*10,T0,k))
     #     #r.draw()
