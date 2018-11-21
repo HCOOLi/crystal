@@ -70,7 +70,31 @@ void Room::py_input_one_ECC(int x,int y,int z, int length, int direction, int mo
 void Room::input_one_circle(vec init, int length, int direction, int movable) {
 
 }
+void Room::construct_by_pylist(py::list chain_list) {
+	polymer_list.clear();
+	lattice = Grid(shape[0], shape[1], shape[2]);
+	for (int i = 0; i < py::len(chain_list); i++) {
+		py::list chain = py::extract<py::list>(chain_list[i]);
+		Polymer p;
+		p.chain.resize(py::len(chain));
+		p.length = py::len(chain);
+		int chain_num = polymer_list.size();
+		for (int j = 0; j < py::len(chain); j++) {
+			py::list point_in_list = py::extract<py::list>(chain[j]);
+			vec point;
+			for (int k = 0; k < py::len(point_in_list); k++) {
+				int x = py::extract<int>(point_in_list[k]);
+				point[k] = x;
+			}
+			p[j] = set_point(point, chain_num, j, 0);
 
+
+		}
+		p.construct();
+		polymer_list.emplace_back(move(p));
+	}
+
+}
 
 void Room::inputECC(int num, int length)
 {

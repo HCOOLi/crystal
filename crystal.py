@@ -17,10 +17,10 @@ class Room():
     def get_result(self):
         pass
 
-    def movie(self):
+    def movie(self, m, n, T):
         pass
 
-    def delete_chain(self):
+    def delete_chain(self, i):
         pass
 
     def cal_Ec(self):
@@ -29,7 +29,5 @@ class Room():
     def cal_Ep(self):
         pass
 
-    def get_result(self):
-        pass
 
     pass
