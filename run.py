@@ -7,8 +7,8 @@ def tuning_washing_small():
     start = time.time()
     p = Pool(11)
     print('Parent process %s.' % os.getpid())
-    for Ep in np.arange(2.0, 5.0, 1.0):
-        for Eb in np.arange(0, 3.2, 0.2):
+    for Ep in np.arange(2.0, 4.0, 1.0):
+        for Eb in np.arange(0, 3.2, 0.6):
             p.apply_async(washing_small_a_b, args=(1, Ep, Eb, Ep * 4))
     print('Waiting for all subprocesses done...')
     p.close()
