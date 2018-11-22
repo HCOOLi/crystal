@@ -64,7 +64,7 @@ class pyRoom(Room):
         self.b_layer = {}
         self.c_layer = {}
 
-        for k in range(0, int(self.shape[2] / 2), 2):
+        for k in range(0, int(self.shape[2] * 3 / 4), 2):
             self.c_layer[k] = []
         for i in range(0, int(self.shape[0])):
             self.a_layer[i] = []
@@ -74,15 +74,15 @@ class pyRoom(Room):
         for i in range(self.shape[0]):
             for j in range(self.shape[1]):
                 if j % 2 == 0 or i % 2 == 0:
-                    for k in range(0, int(self.shape[2] / 2), 2):
+                    for k in range(0, int(3 * self.shape[2] / 4), 2):
                         self.a_layer[i].append(num)
                         self.b_layer[j].append(num)
                         self.c_layer[k].append(num)
-                        self.py_input_one_ECC([i, j, k + int(self.shape[2] / 4)], 2, 2, 1)
+                        self.py_input_one_ECC([i, j, k + int(self.shape[2] / 8)], 2, 2, 1)
 
                         num += 1
                 else:
-                    self.py_input_one_ECC([i, j, int(self.shape[2] / 4)], self.shape[2] / 2, 2, 0)
+                    self.py_input_one_ECC([i, j, int(self.shape[2] / 8)], int(3 * self.shape[2] / 4), 2, 0)
                     num += 1
 
                 pass
@@ -201,21 +201,24 @@ def reconstruct(Ep, Eb, T, k):
     Ep0 = r0.cal_Ep()
 
     r = pyRoom(32, 32, 128, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
-    r.construct_by_pylist(r.load_polymer("chain8/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T * 10, k)))
-    r.draw(path="chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T * 10, k))
-    # thicka, thickb, thickc = r.cal_thick_by_point()
-    #
-    # print("结晶度：%3.1f%%" % (r.cal_Ep() / Ep0 * 100))
-    # print("f=%0.3f" % (r.cal_Ec() / EC_max))
-    # plt.title('a')
-    # plt.hist(thicka)
-    # plt.show()
-    # plt.title('b')
-    # plt.hist(thickb)
-    # plt.show()
-    # plt.title('c')
-    # plt.hist(thickc)
-    # plt.show()
+    r.construct_by_pylist(r.load_polymer("chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k)))
+    r.draw(path="chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
+    thicka, thickb, thickc = r.cal_thick_by_point()
+
+    print("结晶度：%3.1f%%" % (r.cal_Ep() / Ep0 * 100))
+    print("f=%0.3f" % (r.cal_Ec() / EC_max))
+    plt.title('a')
+    thick_num_a, bins, _ = plt.hist(thicka)
+    thick_weight_a = np.asarray(thick_num_a) * np.asarray(bins[1:])
+    print(thick_weight_a)
+    plt.bar(bins[1:], thick_weight_a)
+    plt.show()
+    plt.title('b')
+    plt.hist(thickb)
+    plt.show()
+    plt.title('c')
+    plt.hist(thickc)
+    plt.show()
     os.system("pause")
     return
 
@@ -267,7 +270,8 @@ def washing_small(Ec0, Ep0, Eb0, T0):
         #     # r.remove_c_layer(k + 8)
         #     # r.remove_c_layer(k + 10)
         #     # r.remove_c_layer(k + 12)
-        r.movie(20000, 2000, T0)
+        r.draw()
+        # r.movie(20000, 2000, T0)
         r.save("chain/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0, k))
 
     end = time.time()

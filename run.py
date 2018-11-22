@@ -22,9 +22,9 @@ def reconstructs():
     start = time.time()
     p = Pool(1)
     print('Parent process %s.' % os.getpid())
-    for Ep in np.arange(2.0, 4.0, 0.4):
-        for Eb in np.arange(0, 2.1, 0.4):
-            p.apply_async(reconstruct, args=(Ep, Eb, Ep * 3, 56))
+    for Ep in np.arange(3.0, 4.0, 1):
+        for Eb in np.arange(0, 3.1, 0.4):
+            p.apply_async(reconstruct, args=(Ep, Eb, Ep * 3, 60))
     print('Waiting for all subprocesses done...')
     p.close()
     p.join()
@@ -64,5 +64,5 @@ def tuning_step_heating():
 
 if __name__ == '__main__':
     # reconstructs()
-    washing_small_a_b(1, 3, 1, 3 * 4)
+    washing_small(1, 3, 1, 3 * 4)
     # tuning_washing_small()
