@@ -29,5 +29,6 @@ class Room():
     def cal_Ep(self):
         pass
 
-
+    def construct_by_pylist(self, polylist):
+        pass
     pass
