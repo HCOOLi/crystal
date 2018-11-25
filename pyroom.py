@@ -193,15 +193,15 @@ class pyRoom(Room):
 
 
 def reconstruct(Ep, Eb, T, k):
-    r0 = pyRoom(32, 64, 32, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
+    r0 = pyRoom(32, 96, 32, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
     num_of_chains = 16 * 16
-    chain_length = 64
+    chain_length = 96
     EC_max = num_of_chains * (chain_length - 1)
     r0.py_inputECC(num_of_chains, chain_length)
     Ep0 = r0.cal_Ep()
 
     r = pyRoom(32, 32, 128, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
-    r.construct_by_pylist(r.load_polymer("chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k)))
+    r.construct_by_pylist(r.load_polymer("chain/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T*10, k)))
     r.draw(path="chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
     thicka, thickb, thickc = r.cal_thick_by_point()
 
@@ -258,21 +258,20 @@ def washing_small(Ec0, Ep0, Eb0, T0):
     print('Run task %f ,%f,%f(%s)...' % (Ep0, Eb0, T0, os.getpid()))
     start = time.time()
 
-    r = pyRoom(32, 32, 128, Ec=Ec0, Ep=Ep0, b2a=0, Eb=Eb0)
-    EC_max = 16*16 * (64 - 1)
+    r = pyRoom(16, 16, 256, Ec=Ec0, Ep=Ep0, b2a=0, Eb=Eb0)
     r.py_inputECC_with_small()
 
-    for k in range(0, int(r.shape[2]/2), 4):
+    for k in range(0, int(3*r.shape[2]/4), 4):
         r.remove_c_layer(k)
         r.remove_c_layer(k + 2)
-        #     # r.remove_c_layer(k + 4)
-        #     # r.remove_c_layer(k + 6)
+        # r.remove_c_layer(k + 4)
+        # r.remove_c_layer(k + 6)
         #     # r.remove_c_layer(k + 8)
         #     # r.remove_c_layer(k + 10)
         #     # r.remove_c_layer(k + 12)
-        r.draw()
-        # r.movie(20000, 2000, T0)
-        r.save("chain/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0, k))
+        # r.draw()
+        r.movie(30000, 20000, T0)
+        r.save("chain256/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0*10, k))
 
     end = time.time()
     print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
