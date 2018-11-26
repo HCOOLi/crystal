@@ -43,7 +43,6 @@ def tuning_step_heating(p):
 
 
 if __name__ == '__main__':
-    # reconstruct(1,0.2,36,188)
     start = time.time()
     print('Parent process %s.' % os.getpid())
     try:

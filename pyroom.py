@@ -266,17 +266,17 @@ def washing_small(Ec0, Ep0, Eb0, T0):
     EC_max = 16*16 * (64 - 1)
     r.py_inputECC_with_small()
 
-    for k in range(0, int(r.shape[2]/2), 4):
+    for k in range(0, int(3*r.shape[2]/4), 4):
         r.remove_c_layer(k)
         r.remove_c_layer(k + 2)
-        #     # r.remove_c_layer(k + 4)
-        #     # r.remove_c_layer(k + 6)
+        # r.remove_c_layer(k + 4)
+        # r.remove_c_layer(k + 6)
         #     # r.remove_c_layer(k + 8)
         #     # r.remove_c_layer(k + 10)
         #     # r.remove_c_layer(k + 12)
-        r.draw()
-        # r.movie(20000, 2000, T0)
-        r.save("chain/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0, k))
+        # r.draw()
+        r.movie(30000, 20000, T0)
+        r.save("chain256/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0*10, k))
 
     end = time.time()
     print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
@@ -286,19 +286,19 @@ def washing_small(Ec0, Ep0, Eb0, T0):
 
 def washing_small_a_b(Ec0, Ep0, Eb0, T0):
     # try:
-    print('Run task %f ,%f,%f(%s)...' % (Ep0, Eb0, T0, os.getpid()))
+    print('Run task a %f ,%f,%f(%s)...' % (Ep0, Eb0, T0, os.getpid()))
     start = time.time()
 
     r = pyRoom(32, 32, 128, Ec=Ec0, Ep=Ep0, b2a=0, Eb=Eb0)
     EC_max = 16 * 16 * (64 - 1)
     r.py_inputECC_with_small()
 
-    for k in range(0, int(r.shape[2] / 2), 2):
+    for k in range(0, int(r.shape[0]), 2):
         r.remove_a_layer(k)
         r.remove_a_layer(k + 1)
         r.remove_b_layer(k)
         r.remove_b_layer(k + 1)
-        # r.remove_c_layer(k)
+        r.remove_c_layer(k)
         # r.remove_c_layer(k + 2)
         #     # r.remove_c_layer(k + 4)
         #     # r.remove_c_layer(k + 6)
@@ -306,7 +306,7 @@ def washing_small_a_b(Ec0, Ep0, Eb0, T0):
         #     # r.remove_c_layer(k + 10)
         #     # r.remove_c_layer(k + 12)
         r.movie(20000, 20000, T0)
-        r.save("chain/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0 * 10, k))
+        r.save("chainabc/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0 * 10, k))
 
     end = time.time()
     print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
