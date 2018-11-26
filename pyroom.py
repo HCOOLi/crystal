@@ -193,33 +193,37 @@ class pyRoom(Room):
 
 
 def reconstruct(Ep, Eb, T, k):
-    r0 = pyRoom(32, 64, 32, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
-    num_of_chains = 16 * 16
-    chain_length = 64
-    EC_max = num_of_chains * (chain_length - 1)
-    r0.py_inputECC(num_of_chains, chain_length)
-    Ep0 = r0.cal_Ep()
+    try:
+        r0 = pyRoom(32, 64, 32, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
+        num_of_chains = 16 * 16
+        chain_length = 64
+        EC_max = num_of_chains * (chain_length - 1)
+        r0.py_inputECC(num_of_chains, chain_length)
+        Ep0 = r0.cal_Ep()
 
-    r = pyRoom(32, 32, 128, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
-    r.construct_by_pylist(r.load_polymer("chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k)))
-    r.draw(path="chain2/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
-    thicka, thickb, thickc = r.cal_thick_by_point()
+        r = pyRoom(24, 24, 192, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
+        r.construct_by_pylist(r.load_polymer("chain356/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k)))
+        r.draw(path="chain356/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
+        thicka, thickb, thickc = r.cal_thick_by_point()
 
-    print("结晶度：%3.1f%%" % (r.cal_Ep() / Ep0 * 100))
-    print("f=%0.3f" % (r.cal_Ec() / EC_max))
-    plt.title('a')
-    thick_num_a, bins, _ = plt.hist(thicka)
-    thick_weight_a = np.asarray(thick_num_a) * np.asarray(bins[1:])
-    print(thick_weight_a)
-    plt.bar(bins[1:], thick_weight_a)
-    plt.show()
-    plt.title('b')
-    plt.hist(thickb)
-    plt.show()
-    plt.title('c')
-    plt.hist(thickc)
-    plt.show()
-    os.system("pause")
+        print("结晶度：%3.1f%%" % (r.cal_Ep() / Ep0 * 100))
+        print("f=%0.3f" % (r.cal_Ec() / EC_max))
+        plt.title('a')
+        thick_num_a, bins, _ = plt.hist(thicka)
+        thick_weight_a = np.asarray(thick_num_a) * np.asarray(bins[1:])
+        print(thick_weight_a)
+        plt.bar(bins[1:], thick_weight_a)
+        plt.show()
+        plt.title('b')
+        plt.hist(thickb)
+        plt.show()
+        plt.title('c')
+        plt.hist(thickc)
+        plt.show()
+        os.system("pause")
+    except:
+        print("subprocess wrong")
+        raise Exception("something wrong ")
     return
 
 
@@ -258,7 +262,7 @@ def washing_small(Ec0, Ep0, Eb0, T0):
     print('Run task %f ,%f,%f(%s)...' % (Ep0, Eb0, T0, os.getpid()))
     start = time.time()
 
-    r = pyRoom(32, 32, 128, Ec=Ec0, Ep=Ep0, b2a=0, Eb=Eb0)
+    r = pyRoom(24, 24, 192, Ec=Ec0, Ep=Ep0, b2a=0, Eb=Eb0)
     EC_max = 16*16 * (64 - 1)
     r.py_inputECC_with_small()
 
