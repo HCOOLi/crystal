@@ -46,11 +46,11 @@ if __name__ == '__main__':
     start = time.time()
     print('Parent process %s.' % os.getpid())
     try:
-        with ProcessPoolExecutor(max_workers=5) as p:
+        with ProcessPoolExecutor(max_workers=10) as p:
             # with Pool(5) as p:
             #################################################
             try:
-                reconstructs(p)
+                tuning_washing_small(p)
             except:
                 print("***main catch the error")
 

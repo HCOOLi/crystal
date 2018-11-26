@@ -275,8 +275,8 @@ def washing_small(Ec0, Ep0, Eb0, T0):
         #     # r.remove_c_layer(k + 10)
         #     # r.remove_c_layer(k + 12)
         # r.draw()
-        r.movie(30000, 20000, T0)
-        r.save("chain256/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0*10, k))
+        r.movie(20000, 20000, T0)
+        r.save("chain192/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0*10, k))
 
     end = time.time()
     print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
