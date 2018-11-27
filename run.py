@@ -8,11 +8,12 @@ import numpy as np
 
 def tuning_washing_small(p):
     for Ep in np.arange(0.5, 3.0, 0.2):
-        for Eb in np.arange(0, 0.2, 0.2):
-            try:
-                p.submit(washing_small, 1, Ep, Eb, Ep * 3)
-            except:
-                raise Exception("something wrong")
+        for Eb in np.arange(0.2, 2.0, 0.2):
+            for T in np.arange(2,5,0.5):
+                try:
+                    p.submit(washing_small, 1, Ep, Eb, Ep * T)
+                except:
+                    raise Exception("something wrong")
 
 
 
