@@ -7,10 +7,10 @@ import numpy as np
 
 
 def tuning_washing_small(p):
-    for Ep in np.arange(2.0, 5.0, 1.0):
-        for Eb in np.arange(0, 3.2, 0.2):
+    for Ep in np.arange(0.5, 3.0, 0.2):
+        for Eb in np.arange(0, 0.2, 0.2):
             try:
-                p.submit(washing_small_a_b, 1, Ep, Eb, Ep * 4)
+                p.submit(washing_small, 1, Ep, Eb, Ep * 3)
             except:
                 raise Exception("something wrong")
 
@@ -52,7 +52,7 @@ if __name__ == '__main__':
             try:
                 reconstructs(p)
             except:
-                print("***resonstuct catch the error")
+                print("***main catch the error")
 
             finally:
                 # raise Exception("something wrong")
