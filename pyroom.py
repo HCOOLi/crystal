@@ -10,10 +10,11 @@ from crystal import Room
 
 class pyRoom(Room):
     def __init__(self, a, b, c, Ec=1.0, Ep=1.0, b2a=0.0, Eb=0.0):
-        Room.__init__(self, a, b, c, Ec, Ep, b2a, 0.0, 0.0, Eb)
+        Room.__init__(self, int(a), int(b), int(c), float(Ec), Ep, b2a, 0.0, 0.0, Eb)
         self.shape = np.asarray([a, b, c])
         self.Ec = Ec
         self.Ep = Ep
+        self.Eb = Eb
         self.b2a = b2a
 
     def py_input_one_ECC(self, a, length, direction, ty):
@@ -104,6 +105,7 @@ class pyRoom(Room):
             self.delete_chain(i)
 
     def save(self, file_path):
+        parameters = {"Ep": self.Ep, "Ec": self.Ec, "Eb": self.Eb}
         with open(file_path, 'w') as file:
             file.write(json.dumps(self.get_list()))
 
@@ -191,23 +193,18 @@ class pyRoom(Room):
 
         return True
 
+    def cal_crystal(self):
 
-def reconstruct(Ep, Eb, T, k):
-    try:
-        r0 = pyRoom(32, 64, 32, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
-        num_of_chains = 16 * 16
-        chain_length = 64
+        r0 = pyRoom(self.shape[0], self.shape[2], self.shape[1], Ec=1, Ep=self.Ep, b2a=0, Eb=self.Eb)
+        num_of_chains = self.shape[0] * self.shape[1] / 4
+        chain_length = self.shape[2] / 4 * 3
         EC_max = num_of_chains * (chain_length - 1)
         r0.py_inputECC(num_of_chains, chain_length)
         Ep0 = r0.cal_Ep()
 
-        r = pyRoom(24, 24, 192, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
-        r.construct_by_pylist(r.load_polymer("chain356/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k)))
-        r.draw(path="chain356/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
-        thicka, thickb, thickc = r.cal_thick_by_point()
-
-        print("结晶度：%3.1f%%" % (r.cal_Ep() / Ep0 * 100))
-        print("f=%0.3f" % (r.cal_Ec() / EC_max))
+        thicka, thickb, thickc = self.cal_thick_by_point()
+        print("结晶度：%3.1f%%" % (self.cal_Ep() / Ep0 * 100))
+        print("f=%0.3f" % (self.cal_Ec() / EC_max))
         plt.title('a')
         thick_num_a, bins, _ = plt.hist(thicka)
         thick_weight_a = np.asarray(thick_num_a) * np.asarray(bins[1:])
@@ -220,52 +217,45 @@ def reconstruct(Ep, Eb, T, k):
         plt.title('c')
         plt.hist(thickc)
         plt.show()
+
+
+def reconstruct(parameter):
+    Ep, Eb, T, length = parameter["Ep", "Eb", "T", "length"]
+    k = length * 3 / 4 - 4
+
+    try:
+        print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
+        r = pyRoom(32, 32, 256, Ep=Ep, b2a=0, Eb=Eb)
+        r.construct_by_pylist(r.load_polymer("chain140/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k)))
+        r.draw(path="chain140/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
+        r.cal_crystal()
+
+
         os.system("pause")
     except:
         print("subprocess wrong")
-        raise Exception("something wrong ")
-    return
+        raise Exception("subprocess error ")
+    # return
 
 
-
-
-
-
-
-def room_task(Ec0, Ep0, Eb0, T0):
+def room_task(parameter):
+    Ep, Eb, T, length = parameter["Ep", "Eb", "T", "length"]
     # try:
-    print('Run task %f ,%f,%f(%s)...' % (Ec0, Ep0, T0, os.getpid()))
+    print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
     start = time.time()
-
-    r0 = pyRoom(32, 64, 32, Ec=1, Ep=3, b2a=0, Eb=3)
-    num_of_chains = 16 * 16
-    chain_length = 64
-    EC_max = num_of_chains * (chain_length - 1)
-    r0.py_inputECC(num_of_chains, chain_length)
-    print(r0.cal_Ep())
-
-    r = pyRoom(32, 32, 128, Ec=1, Ep=3, b2a=0, Eb=3)
-
-    r.construct_by_pylist(r.load_polymer("chain/chain-%d,%d,%d,%d.json" % (3 * 10, 10, 12, 60)))
-    r.draw()
-    thicka, thickb, thickc = r.cal_thick_by_point()
-
-    print(r.cal_Ep())
-    print(r.cal_Ec() / EC_max)
-    # print(thicka),print(thickb),print(thickc)
-    plt.hist(thickc)
-    plt.show()
     return
 
 
-def washing_small(Ec0, Ep0, Eb0, T0):
-    print('Run task %f ,%f,%f(%s)...' % (Ep0, Eb0, T0, os.getpid()))
+def washing_small(parameter):
+    Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
+    print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
     start = time.time()
 
-    r = pyRoom(24, 24, 192, Ec=Ec0, Ep=Ep0, b2a=0, Eb=Eb0)
+    r = pyRoom(32, 32, length, Ep=Ep, b2a=0, Eb=Eb)
     EC_max = 16*16 * (64 - 1)
     r.py_inputECC_with_small()
-
+    if not os.path.exists('chain%d' % length):
+        os.mkdir('chain%d' % length)
     for k in range(0, int(3*r.shape[2]/4), 4):
         r.remove_c_layer(k)
         r.remove_c_layer(k + 2)
@@ -275,21 +265,22 @@ def washing_small(Ec0, Ep0, Eb0, T0):
         #     # r.remove_c_layer(k + 10)
         #     # r.remove_c_layer(k + 12)
         # r.draw()
-        r.movie(20000, 20000, T0)
-        r.save("chain192/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0*10, k))
+        r.movie(20000, 20000, T)
+        r.save("chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k))
 
     end = time.time()
-    print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
+    print('Task%f ,%fruns %0.2f seconds.' % (Ep, (end - start)))
 
     return
 
 
-def washing_small_a_b(Ec0, Ep0, Eb0, T0):
+def washing_small_a_b(parameter):
+    Ep, Eb, T, length = parameter["Ep", "Eb", "T", "length"]
     # try:
-    print('Run task a %f ,%f,%f(%s)...' % (Ep0, Eb0, T0, os.getpid()))
+    print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
     start = time.time()
 
-    r = pyRoom(32, 32, 128, Ec=Ec0, Ep=Ep0, b2a=0, Eb=Eb0)
+    r = pyRoom(32, 32, 128, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
     EC_max = 16 * 16 * (64 - 1)
     r.py_inputECC_with_small()
 
@@ -341,30 +332,6 @@ def step_heating(Ec0, Ep0, Eb0, T0):
     # print(thicka),print(thickb),print(thickc)
     plt.hist(thickc)
     plt.show()
-    # for k in range(0, int(r.shape[2]/2), 4):
-    #     r.remove_c_layer(k)
-    #     r.remove_c_layer(k + 2)
-    # #     # r.remove_c_layer(k + 4)
-    # #     # r.remove_c_layer(k + 6)
-    # #     # r.remove_c_layer(k + 8)
-    # #     # r.remove_c_layer(k + 10)
-    # #     # r.remove_c_layer(k + 12)
-    #     r.movie(5000,1000,T0)
-    #     r.save("chain/chain-%d,%d,%d,%d.json"%(Ep0*10,Eb0*10,T0,k))
-    #     #r.draw()
-    # return
-    # E_list, Ec_list, Ep_list, t_list,f=r.stepheating(1,8,0.1,EC_max)
-    # fig2 = plt.figure()
-    #
-    # plt.plot(t_list,f)
-    # #r.draw()
-    # plt.savefig('f%d,%d,%d.png' % (Ec0 * 10, Ep0 * 10, T0 * 10))
-    # plt.show()
-    #
-    # with open('f%d,%d,%d.json' % (Ec0 * 10, Ep0 * 10, T0 * 10), 'w') as file:
-    #     file.write(json.dumps([t_list, f]))
-    # end = time.time()
-    # print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
 
     return
 

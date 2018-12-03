@@ -1,68 +1,47 @@
 from pyroom import *
 import time
-from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import Pool
 import os
 import numpy as np
 
 
-def tuning_washing_small(p):
-    for Ep in np.arange(0.5, 3.0, 0.2):
-        for Eb in np.arange(0.2, 2.0, 0.2):
-            for T in np.arange(2,5,0.5):
-                try:
-                    p.submit(washing_small, 1, Ep, Eb, Ep * T)
-                except:
-                    raise Exception("something wrong")
-
-
-
-def reconstructs(p):
-    for Ep in np.arange(1.4, 2.0, 0.2):
-        for Eb in np.arange(0, 1.0, 0.2):
-            try:
-                # p.apply_async(reconstruct,(Ep, Eb, Ep * 30+5, 188))
-                p.submit(reconstruct, Ep, Eb, Ep * 30 + 5, 188)
-            except:
-                print("***resonstucts catch the error")
-
-                # raise Exception("something wrong")
-
-
-def draw_pictures(p):
-    for Ep in np.arange(2.0, 5.0, 1.0):
-        for Eb in np.arange(3, 6, 1.0):
-            k=60
-            # for k in range(0, 64, 16):
-            p.submit(draw_picture, Ep, Eb, Ep * 4, k)
-
-
-def tuning_step_heating(p):
-    for Ep in np.arange(2.0, 5.0, 1.0):
-        for Eb in np.arange(0, 3.2, 0.4):
-            p.submit(step_heating, 1, Ep, Eb, 10)
 
 
 if __name__ == '__main__':
     start = time.time()
     print('Parent process %s.' % os.getpid())
+    parameter_list = []
+    # for Ep in np.arange(2.0, 5.0, 1.0):
+    #     for Eb in np.arange(0, 3.2, 0.4):
+    Ep = 1.3
+    Eb = 0.2
+    for length in range(128, 256, 32):
+        T = 3.0 * Ep
+        # for T in np.arange(3.0,3.1,0.5):
+        parameter_list.append({"Eb": Eb, "Ep": Ep, "length": length, "T": T})
     try:
-        with ProcessPoolExecutor(max_workers=10) as p:
+        # with ProcessPoolExecutor(max_workers=5) as p:
+        with Pool(5) as p:
+            p.map_async(washing_small, parameter_list)
+            p.close()
+            p.join()
             # with Pool(5) as p:
             #################################################
-            try:
-                tuning_washing_small(p)
-            except:
-                print("***main catch the error")
+            # try:
 
-            finally:
-                # raise Exception("something wrong")
-                print('Waiting for all subprocesses done...')
+        # reconstruct(1.4,0.4,44,140)
+        # except:
+        #     print("***main catch the error")
+
+        # finally:
+        #     # raise Exception("something wrong")
+        #     print('Waiting for all subprocesses done...')
 
             #################################################
     except:
         print("shutdown")
-        p.shutdown(wait=False)
+        p.terminate()
+        # p.shutdown(wait=False)
 
     print('All subprocesses done.')
     end = time.time()
