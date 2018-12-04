@@ -220,26 +220,29 @@ class pyRoom(Room):
 
 
 def reconstruct(parameter):
-    Ep, Eb, T, length = parameter["Ep", "Eb", "T", "length"]
+    Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
+
     k = length * 3 / 4 - 4
 
     try:
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
         r = pyRoom(32, 32, 256, Ep=Ep, b2a=0, Eb=Eb)
-        r.construct_by_pylist(r.load_polymer("chain140/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k)))
-        r.draw(path="chain140/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k))
+        r.construct_by_pylist(r.load_polymer("chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k)))
+        r.draw(path="chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k))
         r.cal_crystal()
 
 
         os.system("pause")
-    except:
+    except Exception as e:
+        print(e)
         print("subprocess wrong")
         raise Exception("subprocess error ")
     # return
 
 
 def room_task(parameter):
-    Ep, Eb, T, length = parameter["Ep", "Eb", "T", "length"]
+    Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
+
     # try:
     print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
     start = time.time()
@@ -251,7 +254,7 @@ def washing_small(parameter):
     print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
     start = time.time()
 
-    r = pyRoom(32, 32, length, Ep=Ep, b2a=0, Eb=Eb)
+    r = pyRoom(24, 24, length, Ep=Ep, b2a=0, Eb=Eb)
     EC_max = 16*16 * (64 - 1)
     r.py_inputECC_with_small()
     if not os.path.exists('chain%d' % length):
@@ -275,7 +278,8 @@ def washing_small(parameter):
 
 
 def washing_small_a_b(parameter):
-    Ep, Eb, T, length = parameter["Ep", "Eb", "T", "length"]
+    Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
+
     # try:
     print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
     start = time.time()
