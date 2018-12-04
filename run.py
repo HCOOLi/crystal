@@ -6,24 +6,23 @@ import os
 import numpy as np
 
 
-
-
 if __name__ == '__main__':
     start = time.time()
     print('Parent process %s.' % os.getpid())
     parameter_list = []
-    # for Ep in np.arange(2.0, 5.0, 1.0):
-    #     for Eb in np.arange(0, 3.2, 0.4):
+
     Ep = 1.3
-    Eb = 0.2
-    for length in range(128, 256, 32):
-        T = 3.0 * Ep
-        # for T in np.arange(3.0,3.1,0.5):
-        parameter_list.append({"Eb": Eb, "Ep": Ep, "length": length, "T": T})
+
+    for Eb in [0.2, 0.4]:
+        for length in [160, 192, 224, 256]:
+            T = 3.0 * Ep
+            # for T in np.arange(3.0,3.1,0.5):
+            parameter_list.append({"Eb": Eb, "Ep": Ep, "length": length, "T": T})
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
-        with Pool(5) as p:
+        with Pool(10) as p:
             p.map_async(washing_small, parameter_list)
+            # p.map_async(reconstruct, parameter_list)
             p.close()
             p.join()
             # with Pool(5) as p:
