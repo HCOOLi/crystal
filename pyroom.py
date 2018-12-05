@@ -203,32 +203,36 @@ class pyRoom(Room):
         Ep0 = r0.cal_Ep()
 
         thicka, thickb, thickc = self.cal_thick_by_point()
+        print('Ep=%f,Eb=%f,length=%f   a' % (self.Ep, self.Eb, self.shape[2]))
         print("结晶度：%3.1f%%" % (self.cal_Ep() / Ep0 * 100))
         print("f=%0.3f" % (self.cal_Ec() / EC_max))
-        plt.title('a')
-        thick_num_a, bins, _ = plt.hist(thicka)
-        thick_weight_a = np.asarray(thick_num_a) * np.asarray(bins[1:])
-        print(thick_weight_a)
-        plt.bar(bins[1:], thick_weight_a)
+        plt.title('Ep=%f,Eb=%f,length=%f   a' % (self.Ep, self.Eb, self.shape[2]))
+        plt.hist(thicka)
         plt.show()
-        plt.title('b')
+        plt.title('Ep=%f,Eb=%f,length=%f   b' % (self.Ep, self.Eb, self.shape[2]))
         plt.hist(thickb)
         plt.show()
-        plt.title('c')
+        plt.title('Ep=%f,Eb=%f,length=%f   c' % (self.Ep, self.Eb, self.shape[2]))
         plt.hist(thickc)
         plt.show()
 
 
 def reconstruct(parameter):
-    Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
-
+    Ep, Eb, T, length, T_anneal = parameter["Ep"], parameter["Eb"], parameter["T"], \
+                                  parameter["length"], parameter["T_anneal"]
     k = length * 3 / 4 - 4
+    if T_anneal != 0:
+        loadpath = "chain%d/chain-%d,%d,%d,%d-annealed in%d.json" % \
+                   (length, Ep * 10, Eb * 10, T * 10, k, T_anneal * 10)
+    else:
+        loadpath = "chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k)
+
 
     try:
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
         r = pyRoom(24, 24, length, Ep=Ep, b2a=0, Eb=Eb)
-        r.construct_by_pylist(r.load_polymer("chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k)))
-        r.draw(path="chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k))
+        r.construct_by_pylist(r.load_polymer(filepath=loadpath))
+        r.draw(path=loadpath)
         r.cal_crystal()
 
 
@@ -240,13 +244,29 @@ def reconstruct(parameter):
     # return
 
 
-def room_task(parameter):
-    Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
+def anneal(parameter):
+    Ep, Eb, T, length, T_anneal = parameter["Ep"], parameter["Eb"], parameter["T"], \
+                                  parameter["length"], parameter["T_anneal"]
 
-    # try:
-    print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
-    start = time.time()
-    return
+    k = length * 3 / 4 - 4
+    loadpath = "chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k)
+    savepath = "chain%d/chain-%d,%d,%d,%d-annealed in%d.json" % \
+               (length, Ep * 10, Eb * 10, T * 10, k, T_anneal * 10)
+    try:
+        print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
+        r = pyRoom(24, 24, length, Ep=Ep, b2a=0, Eb=Eb)
+        r.construct_by_pylist(r.load_polymer(loadpath))
+
+        r.movie(30000 * int(length / 12), 20000, T)
+        r.save(savepath)
+        # r.draw(path="chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k))
+        # r.cal_crystal()
+
+    except Exception as e:
+        print(e)
+        print("subprocess wrong")
+        raise Exception("subprocess error ")
+    # return
 
 
 def washing_small(parameter):
