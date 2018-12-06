@@ -14,16 +14,16 @@ if __name__ == '__main__':
     Ep = 1.3
 
     for Eb in [0.2, 0.4]:
-        for length in [128, 160, 192, 224, 256]:
+        for length in [128, 160]:
             for T in [3.0 * Ep]:
-                for T_anneal in [0]:
+                for T_anneal in [3.0 * Ep]:
                     parameter_list.append({"Eb": Eb, "Ep": Ep, "length": length, "T": T, "T_anneal": T_anneal})
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
-        with Pool(10) as p:
-            p.map_async(washing_small, parameter_list)
+        with Pool(4) as p:
+            # p.map_async(washing_small, parameter_list)
             # p.map_async(reconstruct, parameter_list)
-            # p.map_async(anneal, parameter_list)
+            p.map_async(anneal, parameter_list)
             p.close()
             p.join()
             # with Pool(5) as p:
