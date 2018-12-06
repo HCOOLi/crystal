@@ -15,16 +15,14 @@ if __name__ == '__main__':
 
     for Eb in [0.2, 0.4]:
         for length in [128, 160, 192, 224, 256]:
-            T = 3.0 * Ep
-            for T_anneal in [2.5 * Ep, 3.0 * Ep]:
-
-            # for T in np.arange(3.0,3.1,0.5):
-            parameter_list.append({"Eb": Eb, "Ep": Ep, "length": length, "T": T, "T_anneal": T_anneal})
+            for T in [3.0 * Ep]:
+                for T_anneal in [0]:
+                    parameter_list.append({"Eb": Eb, "Ep": Ep, "length": length, "T": T, "T_anneal": T_anneal})
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
         with Pool(10) as p:
-            # p.map_async(washing_small, parameter_list)
-            p.map_async(reconstruct, parameter_list)
+            p.map_async(washing_small, parameter_list)
+            # p.map_async(reconstruct, parameter_list)
             # p.map_async(anneal, parameter_list)
             p.close()
             p.join()
