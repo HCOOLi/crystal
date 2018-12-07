@@ -31,4 +31,7 @@ class Room():
 
     def construct_by_pylist(self, polylist):
         pass
+
+    def cal_thickness(self):
+        pass
     pass

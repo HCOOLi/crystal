@@ -118,27 +118,32 @@ class pyRoom(Room):
         for i in range(self.shape[0]):
             self.py_input_one_ECC([0, i, 0], self.shape[2], 2, 1)
 
+    def new_draw_box(self, point1, point2, box_color='blue'):
+        from vpython import canvas, vector, curve, color
+        # def into_vector(a):
+        #     return vector(a[0], a[1], a[2])
+
+        p1 = [0, 0, 0]
+        p2 = [0, 0, 0]
+        radius = 0.05
+        if box_color == 'blue':
+            box_color = color.blue
+        if box_color == 'red':
+            box_color = color.red
+        for a in range(2):
+            for b in range(2):
+                for c in range(3):
+                    p1[c], p2[c] = point1[c], point2[c]
+
+                    p1[(c + 1) % 3] = point1[(c + 1) % 3] if a == 0 else point2[(c + 1) % 3]
+                    p2[(c + 1) % 3] = point1[(c + 1) % 3] if a == 0 else point2[(c + 1) % 3]
+                    p1[(c + 2) % 3] = point1[(c + 2) % 3] if b == 0 else point2[(c + 2) % 3]
+                    p2[(c + 2) % 3] = point1[(c + 2) % 3] if b == 0 else point2[(c + 2) % 3]
+                    c = curve(vector(p1[0], p1[1], p1[2]), vector(p2[0], p2[1], p2[2]), color=box_color, radius=radius)
+
     def draw_box(self):
         from vpython import canvas, vector, curve, color
-        radius = 0.05
-        box_color = color.blue
-        c = curve(vector(0, 0, 0), vector(0, 0, self.shape[2]), color=box_color, radius=radius)
-        c = curve(vector(self.shape[0], 0, 0), vector(self.shape[0], 0, self.shape[2]), color=box_color, radius=radius)
-        c = curve(vector(0, self.shape[1], 0), vector(0, self.shape[1], self.shape[2]), color=box_color, radius=radius)
-        c = curve(vector(self.shape[0], self.shape[1], 0), vector(self.shape[0], self.shape[1], self.shape[2]),
-                  color=box_color, radius=radius)
-
-        c = curve(vector(0, 0, 0), vector(self.shape[0], 0, 0), color=box_color, radius=radius)
-        c = curve(vector(0, 0, self.shape[2]), vector(self.shape[0], 0, self.shape[2]), color=box_color, radius=radius)
-        c = curve(vector(0, self.shape[1], 0), vector(self.shape[0], self.shape[1], 0), color=box_color, radius=radius)
-        c = curve(vector(0, self.shape[1], self.shape[2]), vector(self.shape[0], self.shape[1], self.shape[2]),
-                  color=box_color, radius=radius)
-
-        c = curve(vector(0, 0, 0), vector(0, self.shape[1], 0), color=box_color, radius=radius)
-        c = curve(vector(self.shape[0], 0, 0), vector(self.shape[0], self.shape[1], 0), color=box_color, radius=radius)
-        c = curve(vector(0, 0, self.shape[2]), vector(0, self.shape[1], self.shape[2]), color=box_color, radius=radius)
-        c = curve(vector(self.shape[0], 0, self.shape[2]), vector(self.shape[0], self.shape[1], self.shape[2]),
-                  color=box_color, radius=0.1)
+        self.new_draw_box([0, 0, 0], self.shape)
 
     def draw(self, polylist=None, path=None):
         from vpython import canvas, vector, curve, color
@@ -204,8 +209,9 @@ class pyRoom(Room):
 
         thicka, thickb, thickc = self.cal_thick_by_point()
         print('Ep=%f,Eb=%f,length=%f   a' % (self.Ep, self.Eb, self.shape[2]))
-        print("结晶度：%3.1f%%" % (self.cal_Ep() / Ep0 * 100))
-        print("f=%0.3f" % (self.cal_Ec() / EC_max))
+        print("Ep结晶度：%3.1f%%" % (self.cal_Ep() / Ep0 * 100))
+        print("Ec结晶度：%3.1f%%" % ((self.cal_Ec() / EC_max + 1) * 100))
+        print("max=%d" % max(thickc))
         plt.title('Ep=%f,Eb=%f,length=%f   a' % (self.Ep, self.Eb, self.shape[2]))
         plt.hist(thicka)
         plt.show()
@@ -216,24 +222,44 @@ class pyRoom(Room):
         plt.hist(thickc)
         plt.show()
 
+    def py_cal_thickness(self):
+        thicknesslist = self.cal_thickness()
+        plot_list = []
+        for lammellar in thicknesslist:
+            a = lammellar[0] - lammellar[3]
+            b = lammellar[1] - lammellar[4]
+            c = lammellar[2] - lammellar[5]
+            self.new_draw_box([lammellar[0], lammellar[1], lammellar[2]], [lammellar[3], lammellar[4], lammellar[5]],
+                              'red')
+            plot_list.append([(a + b) / 2, c])
+
+        plt.figure()
+        plt.title('Ep=%f,Eb=%f,length=%f  ' % (self.Ep, self.Eb, self.shape[2]))
+        plt.xlabel('(a+b)/2')
+        plt.ylabel('c')
+        plt.scatter(x=np.asarray(plot_list)[:, 0], y=np.asarray(plot_list)[:, 1])
+        plt.show()
+
 
 def reconstruct(parameter):
     Ep, Eb, T, length, T_anneal = parameter["Ep"], parameter["Eb"], parameter["T"], \
                                   parameter["length"], parameter["T_anneal"]
     k = length * 3 / 4 - 4
     if T_anneal != 0:
-        loadpath = "chain%d/chain-%d,%d,%d,%d-annealed in%d.json" % \
+        loadpath = "step20000/chain%d/chain-%d,%d,%d,%d-annealed in%d.json" % \
                    (length, Ep * 10, Eb * 10, T * 10, k, T_anneal * 10)
     else:
-        loadpath = "chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k)
+        loadpath = "step20000/chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k)
 
 
     try:
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
-        r = pyRoom(24, 24, length, Ep=Ep, b2a=0, Eb=Eb)
+        r = pyRoom(32, 32, length, Ep=Ep, b2a=0, Eb=Eb)
         r.construct_by_pylist(r.load_polymer(filepath=loadpath))
         r.draw(path=loadpath)
+        # r.py_cal_thickness()
         r.cal_crystal()
+
 
 
         os.system("pause")
@@ -254,10 +280,10 @@ def anneal(parameter):
                (length, Ep * 10, Eb * 10, T * 10, k, T_anneal * 10)
     try:
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
-        r = pyRoom(24, 24, length, Ep=Ep, b2a=0, Eb=Eb)
+        r = pyRoom(32, 32, length, Ep=Ep, b2a=0, Eb=Eb)
         r.construct_by_pylist(r.load_polymer(loadpath))
 
-        r.movie(30000 * int(length / 12), 20000, T)
+        r.movie(30000 * int(length / 12), 20000, T_anneal)
         r.save(savepath)
         # r.draw(path="chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k))
         # r.cal_crystal()
@@ -323,11 +349,11 @@ def washing_small_a_b(parameter):
         #     # r.remove_c_layer(k + 8)
         #     # r.remove_c_layer(k + 10)
         #     # r.remove_c_layer(k + 12)
-        r.movie(20000, 20000, T0)
-        r.save("chainabc/chain-%d,%d,%d,%d.json" % (Ep0 * 10, Eb0 * 10, T0 * 10, k))
+        r.movie(20000, 20000, T)
+        r.save("chainabc/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T * 10, k))
 
     end = time.time()
-    print('Task%f ,%fruns %0.2f seconds.' % (Ec0, Ep0, (end - start)))
+    print('Task%f ,%fruns %0.2f seconds.' % (Ec, Ep, (end - start)))
 
     return
 

@@ -85,3 +85,30 @@ inline bool operator==(const vec& a, const vec& b)
 	return true;
 }
 
+class Matrix3 {
+
+	vector<vector<vector<int> > > _v;
+public:
+	Matrix3() {
+
+	}
+	Matrix3(int x, int y, int z) {
+		_v.resize(x);
+		for (auto & __v : _v) {
+			__v.resize(y);
+			for (auto &___v : __v) {
+				___v.resize(z);
+				for (auto &x : ___v) {
+					x = 0;
+				}
+			}
+		}
+	}
+	vector<vector<int> > &operator[](int x) {
+		return _v[x];
+	}
+	const vector<vector<int> > &operator[](int x) const {
+		return _v[x];
+	}
+
+};

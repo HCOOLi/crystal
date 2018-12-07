@@ -237,7 +237,9 @@ public:
 	double count_parallel_nearby_allB(vec & point1, vec & point2, const deque<vec>& que, int cal_type) const;
 
 	py::list cal_thick_by_point()const;
-	
+	py::list cal_thickness()const;
+
+
 	double cal_Rg()const;
 	double cal_h2()const;
 	double cal_PSM()const;

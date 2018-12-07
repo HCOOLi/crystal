@@ -2,7 +2,7 @@
 #include<stack>
 #include<tuple>
 #include<fstream>
-
+#include"ConnectedComponent.h"
 
 
 inline bool find_in_que(const deque<vec> &que, vec p) {
@@ -1290,6 +1290,32 @@ py::list Room::cal_thick_by_point()const//计算厚度
 
 	return *thickness;
 }
+
+py::list Room::cal_thickness()const//计算厚度
+{
+
+	matrix::Matrix3 temp_lattice(shape[0],shape[1],shape[2]-1);
+	
+
+	vec point1, point2;
+	
+	for (int i = 0; i < shape[0]; i++) {
+		for (int j = 0; j < shape[1]; j++) {
+			for (int k = 0; k < shape[2] - 1; k++) {
+				point1[0] = i; point2[0] = i;
+				point1[1] = j; point2[1] = j;
+				point1[2] = k; point2[2] = k + 1;
+				if (this->get_side_num(point1, point2) != -1) {
+					temp_lattice[i][j][k] = 1;	
+				}
+			}
+		}
+	}
+
+	matrix::ConnectedComponentLabeling(temp_lattice);
+	return matrix::ConnectedComponentLabeling(temp_lattice);
+}
+
 
 double Room::cal_Rg()const// 均方旋转半径
 {
