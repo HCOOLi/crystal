@@ -318,7 +318,7 @@ def washing_small(parameter):
             r.save("chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k))
 
         end = time.time()
-        print('Task%f ,%fruns %0.2f seconds.' % (Ep, (end - start)))
+        print('Task%fruns %0.2f seconds.' % (Ep, (end - start)))
     except Exception as e:
         print(e)
         raise Exception("subprocess error")

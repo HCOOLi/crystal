@@ -26,6 +26,19 @@ if __name__ == '__main__':
             # p.map_async(anneal, parameter_list)
             p.close()
             p.join()
+            # with Pool(5) as p:
+            #################################################
+            # try:
+
+        # reconstruct(1.4,0.4,44,140)
+        # except:
+        #     print("***main catch the error")
+
+        # finally:
+        #     # raise Exception("something wrong")
+        #     print('Waiting for all subprocesses done...')
+
+            #################################################
     except:
         print("shutdown")
         p.terminate()
