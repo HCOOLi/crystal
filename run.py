@@ -12,10 +12,9 @@ if __name__ == '__main__':
     parameter_list = []
 
     Ep = 1.3
-
-    for Eb in [0.2, 0.4]:
-        for length in [160]:
-            for T in [3.0 * Ep]:
+    for Eb in [0.1, 0.3]:
+        for length in [128, 160, 192, 224, 256]:
+            for T in [2.8 * Ep, 3.0 * Ep, 3.2 * Ep]:
                 for T_anneal in [0]:
                     parameter_list.append({"Eb": Eb, "Ep": Ep, "length": length, "T": T, "T_anneal": T_anneal})
     try:

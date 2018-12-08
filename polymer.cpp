@@ -1301,7 +1301,8 @@ py::list Room::cal_thickness()const//º∆À„∫Ò∂»
 	
 	for (int i = 0; i < shape[0]; i++) {
 		for (int j = 0; j < shape[1]; j++) {
-			for (int k = 0; k < shape[2] - 1; k++) {
+			/*for (int k = 0; k < shape[2] - 1; k++) {*/
+			for (int k =int( shape[2]*3/4)+15; k < shape[2] - 1; k++) {
 				point1[0] = i; point2[0] = i;
 				point1[1] = j; point2[1] = j;
 				point1[2] = k; point2[2] = k + 1;
