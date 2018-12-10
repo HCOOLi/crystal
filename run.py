@@ -21,9 +21,9 @@ if __name__ == '__main__':
                                 {"Eb": Eb, "Ep": Ep, "length": length, "T": T, "T_anneal": T_anneal, "steps": steps})
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
-        with Pool(5) as p:
-            p.map_async(washing_small, parameter_list)
-            # p.map_async(reconstruct, parameter_list)
+        with Pool(2) as p:
+            # p.map_async(washing_small, parameter_list)
+            p.map_async(reconstruct, parameter_list)
             # p.map_async(anneal, parameter_list)
             p.close()
             p.join()

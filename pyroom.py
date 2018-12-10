@@ -242,15 +242,17 @@ class pyRoom(Room):
 
 
 def reconstruct(parameter):
-    Ep, Eb, T, length, T_anneal = parameter["Ep"], parameter["Eb"], parameter["T"], \
-                                  parameter["length"], parameter["T_anneal"]
+    Ep, Eb, T, length, T_anneal,steps = parameter["Ep"], parameter["Eb"], parameter["T"], \
+                                  parameter["length"], parameter["T_anneal"],parameter["steps"]
     k = length * 3 / 4 - 4
     if T_anneal != 0:
-        loadpath = "step20000/chain%d/chain-%d,%d,%d,%d-annealed in%d.json" % \
-                   (length, Ep * 10, Eb * 10, T * 10, k, T_anneal * 10)
+        loadpath = "steps%d/chain%d/chain-%d,%d,%d,%d-annealed in%d.json" % \
+                   (steps,length, Ep * 10, Eb * 10, T * 10, k, T_anneal * 10)
+        # loadpath = "chain%d/chain-%3.2f,%3.2f,%3.2f,%d-annealed in%3.2f.json" % \
+        #            (length, Ep, Eb, T, k, T_anneal)
     else:
-        loadpath = "step20000/chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k)
-
+        loadpath = "steps%d/chain%d/chain-%d,%d,%d,%d.json" % (steps,length, Ep * 10, Eb * 10, T * 10, k)
+        # loadpath = "chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k)
 
     try:
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
@@ -276,8 +278,9 @@ def anneal(parameter):
 
     k = length * 3 / 4 - 4
     loadpath = "chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k)
-    savepath = "chain%d/chain-%d,%d,%d,%d-annealed in%d.json" % \
-               (length, Ep * 10, Eb * 10, T * 10, k, T_anneal * 10)
+    # loadpath = "chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k)
+    # savepath = "chain%d/chain-%3.2f,%3.2f,%3.2f,%d-annealed in%3.2f.json" % \
+    #                (length, Ep, Eb, T, k, T_anneal)
     try:
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
         r = pyRoom(32, 32, length, Ep=Ep, b2a=0, Eb=Eb)
