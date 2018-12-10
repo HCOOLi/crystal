@@ -254,6 +254,7 @@ def reconstruct(parameter):
         loadpath = "steps%d/chain%d/chain-%d,%d,%d,%d.json" % (steps,length, Ep * 10, Eb * 10, T * 10, k)
         # loadpath = "chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k)
 
+
     try:
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
         r = pyRoom(32, 32, length, Ep=Ep, b2a=0, Eb=Eb)
@@ -279,8 +280,8 @@ def anneal(parameter):
     k = length * 3 / 4 - 4
     loadpath = "chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k)
     # loadpath = "chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k)
-    # savepath = "chain%d/chain-%3.2f,%3.2f,%3.2f,%d-annealed in%3.2f.json" % \
-    #                (length, Ep, Eb, T, k, T_anneal)
+    savepath = "chain%d/chain-%3.2f,%3.2f,%3.2f,%d-annealed in%3.2f.json" % \
+               (length, Ep, Eb, T, k, T_anneal)
     try:
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
         r = pyRoom(32, 32, length, Ep=Ep, b2a=0, Eb=Eb)
@@ -320,9 +321,11 @@ def washing_small(parameter):
             #     # r.remove_c_layer(k + 10)
             #     # r.remove_c_layer(k + 12)
             # r.draw()
-            r.movie(int(steps * length / 128), 20000, T)
-            r.save("steps%d/chain%d/chain-%d,%d,%d,%d.json" % (steps, length, Ep * 10, Eb * 10, T * 10, k))
-
+            r.movie(steps, 20000, T)
+            print("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k))
+            if k % 24 == 0:
+                r.save("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k))
+        r.save("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, int(3 * r.shape[2] / 4) - 4))
         end = time.time()
         print('Task%fruns %0.2f seconds.' % (Ep, (end - start)))
     except Exception as e:
