@@ -29,6 +29,9 @@ class Room():
     def cal_Ep(self):
         pass
 
+    def cal_thick_by_point(self):
+        pass
+
     def construct_by_pylist(self, polylist):
         pass
 

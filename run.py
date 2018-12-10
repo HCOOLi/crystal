@@ -11,18 +11,19 @@ if __name__ == '__main__':
     print('Parent process %s.' % os.getpid())
     parameter_list = []
 
-    Ep = 1.3
-
-    for Eb in [0.2, 0.4]:
-        for length in [160]:
-            for T in [3.0 * Ep]:
-                for T_anneal in [0]:
-                    parameter_list.append({"Eb": Eb, "Ep": Ep, "length": length, "T": T, "T_anneal": T_anneal})
+    for Ep in [1.3]:
+        for Eb in [0.2, 0.4]:
+            for length in [160]:
+                for T in [3.0 * Ep]:
+                    for T_anneal in [0]:
+                        for steps in [2000, 3000, 4000]:
+                            parameter_list.append(
+                                {"Eb": Eb, "Ep": Ep, "length": length, "T": T, "T_anneal": T_anneal, "steps": steps})
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
-        with Pool(2) as p:
-            # p.map_async(washing_small, parameter_list)
-            p.map_async(reconstruct, parameter_list)
+        with Pool(5) as p:
+            p.map_async(washing_small, parameter_list)
+            # p.map_async(reconstruct, parameter_list)
             # p.map_async(anneal, parameter_list)
             p.close()
             p.join()

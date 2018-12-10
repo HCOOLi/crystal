@@ -297,14 +297,17 @@ def anneal(parameter):
 
 def washing_small(parameter):
     try:
-        Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
+        Ep, Eb, T, length, steps = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"], parameter[
+            "steps"]
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
         start = time.time()
 
         r = pyRoom(24, 24, length, Ep=Ep, b2a=0, Eb=Eb)
         r.py_inputECC_with_small()
-        if not os.path.exists('chain%d' % length):
-            os.mkdir('chain%d' % length)
+        if not os.path.exists('steps%d' % steps):
+            os.mkdir('steps%d' % steps)
+        if not os.path.exists('steps%d/chain%d' % (steps, length)):
+            os.mkdir('steps%d/chain%d' % (steps, length))
         for k in range(0, int(3 * r.shape[2] / 4), 4):
             r.remove_c_layer(k)
             r.remove_c_layer(k + 2)
@@ -314,8 +317,8 @@ def washing_small(parameter):
             #     # r.remove_c_layer(k + 10)
             #     # r.remove_c_layer(k + 12)
             # r.draw()
-            r.movie(int(30000 * length / 128), 20000, T)
-            r.save("chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k))
+            r.movie(int(steps * length / 128), 20000, T)
+            r.save("steps%d/chain%d/chain-%d,%d,%d,%d.json" % (steps, length, Ep * 10, Eb * 10, T * 10, k))
 
         end = time.time()
         print('Task%fruns %0.2f seconds.' % (Ep, (end - start)))
