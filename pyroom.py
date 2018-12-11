@@ -226,12 +226,14 @@ class pyRoom(Room):
         thicknesslist = self.cal_thickness()
         plot_list = []
         for lammellar in thicknesslist:
-            a = lammellar[0] - lammellar[3]
-            b = lammellar[1] - lammellar[4]
-            c = lammellar[2] - lammellar[5]
-            self.new_draw_box([lammellar[0], lammellar[1], lammellar[2]], [lammellar[3], lammellar[4], lammellar[5]],
-                              'red')
-            plot_list.append([(a + b) / 2, c])
+            if lammellar:
+                a = lammellar[0] - lammellar[3]
+                b = lammellar[1] - lammellar[4]
+                c = lammellar[2] - lammellar[5]
+                self.new_draw_box([lammellar[0], lammellar[1], lammellar[2]],
+                                  [lammellar[3], lammellar[4], lammellar[5]],
+                                  'red')
+                plot_list.append([(a + b) / 2, c])
 
         plt.figure()
         plt.title('Ep=%f,Eb=%f,length=%f  ' % (self.Ep, self.Eb, self.shape[2]))
@@ -260,7 +262,7 @@ def reconstruct(parameter):
         r = pyRoom(32, 32, length, Ep=Ep, b2a=0, Eb=Eb)
         r.construct_by_pylist(r.load_polymer(filepath=loadpath))
         r.draw(path=loadpath)
-        # r.py_cal_thickness()
+        r.py_cal_thickness()
         r.cal_crystal()
 
 

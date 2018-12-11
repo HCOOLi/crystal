@@ -27,7 +27,7 @@ namespace matrix {
 	}
 
 	py::list labeling_nearby(const Matrix3 & bitmap, Matrix3 & label, stack<vec3 > & que, int index) {
-		static  vector<vec3> direction = { {-1,0,0},{1,0,0},{0,-1,0},{0,1,0},{0,0,-1} ,{0,0,1} };
+		static  vector<vec3> direction = { {-1,0,0},{1,0,0},{0,-1,0},{0,1,0} ,{0,0,1} };
 		array<int, 6> a{ 0,0,0,bitmap.shape[0],bitmap.shape[1] ,bitmap.shape[2] };
 		while (!que.empty())
 		{
@@ -43,6 +43,15 @@ namespace matrix {
 							update_min_max(a, next);
 							que.emplace(next);
 						}
+						/*else if(bitmap[next] == -1){
+							if (!que.empty()) {
+								stack<vec3> emptystack;
+								que.swap(emptystack);
+							}
+							
+							return  *(new py::list);
+							
+						}*/
 						else {
 							label[next] = -1;
 						}
@@ -56,31 +65,89 @@ namespace matrix {
 		return *results;
 
 	}
+	void prelabeling_nearby(const Matrix3 & bitmap, Matrix3 & label, stack<vec3 > & que, int index) {
+		static  vector<vec3> direction = { {-1,0,0},{1,0,0},{0,-1,0},{0,1,0} };
+		array<int, 6> a{ 0,0,0,bitmap.shape[0],bitmap.shape[1] ,bitmap.shape[2] };
+		while (!que.empty())
+		{
+			vec3 seed = que.top();
+			que.pop();
+			update_min_max(a, seed);
+			for (auto &dir : direction) {
+				vec3 next = seed + dir;
+				if (next >= vec3{ 0,0,0 } && next < bitmap.shape) {
+					if (label[next] == 0) {
+						if (bitmap[next] == 1) {
+							label[next] = -1;
+							que.emplace(next);
+						}
+						/*else if(bitmap[next] == -1){
+							if (!que.empty()) {
+								stack<vec3> emptystack;
+								que.swap(emptystack);
+							}
+
+							return  *(new py::list);
+
+						}*/
+						else {
+							label[next] = -1;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	py::list ConnectedComponentLabeling(const Matrix3 & bitmap) {
 		Matrix3 label(bitmap.shape);
 		stack<vec3 > que;
 		py::list *results = new py::list;
 		int label_index = 0;
-		for (int i = 0; i < bitmap.shape[0]; i++) {
-			for (int j = 0; j < bitmap.shape[1]; j++) {
-				for (int k = 0; k < bitmap.shape[2]; k++) {
+		for (int k = 0; k < bitmap.shape[2]; k++) {
+			int count_1 = 0;
+			for (int i = 0; i < bitmap.shape[0]; i++) {
+				for (int j = 0; j < bitmap.shape[1]; j++) {
 					if (label[i][j][k] == 0) {
-						if (bitmap[i][j][k] == 1) {
-
-							label_index++;
-							label[i][j][k] = label_index;
-							que.emplace(vec3{ i,j,k });
-							results->append(labeling_nearby(bitmap, label, que, label_index));
-						}
-						else {
-							label[i][j][k] = -1;
+						if (bitmap[i][j][k] == -1) {
+							count_1++;
+							if (count_1>5) {
+								for (int i = 0; i < bitmap.shape[0]; i++) {
+									for (int j = 0; j < bitmap.shape[1]; j++) {
+										label[i][j][k] = -1;
+									}
+								}
+								k++;
+								count_1 = 0;
+							}
+						
+							
 						}
 					}
 				}
-
 			}
 		}
+					
+		
+	for (int k = 0; k < bitmap.shape[2]; k++) {
+		for (int i = 0; i < bitmap.shape[0]; i++) {
+			for (int j = 0; j < bitmap.shape[1]; j++) {
+				if (label[i][j][k] == 0) {
+					if (bitmap[i][j][k] == 1) {
+
+						label_index++;
+						label[i][j][k] = label_index;
+						que.emplace(vec3{ i,j,k });
+						results->append(labeling_nearby(bitmap, label, que, label_index));
+					}
+					else {
+						label[i][j][k] = -1;
+					}
+				}
+			}
+
+		}
+	}
 		return *results;
 	}
 }

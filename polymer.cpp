@@ -1306,8 +1306,20 @@ py::list Room::cal_thickness()const//¼ÆËãºñ¶È
 				point1[0] = i; point2[0] = i;
 				point1[1] = j; point2[1] = j;
 				point1[2] = k; point2[2] = k + 1;
-				if (this->get_side_num(point1, point2) != -1) {
-					temp_lattice[i][j][k] = 1;	
+				auto p1 = lattice[point1], p2 = lattice[point2];
+				if (p1 == nullptr || p2 == nullptr) {
+					continue;
+				}
+				else if (p1->chain_num== p2->chain_num) {
+					if (p1->pos_in_chain - p2->pos_in_chain == -1) {
+						temp_lattice[i][j][k] = 1;
+
+					}
+					else if (p1->pos_in_chain - p2->pos_in_chain == 1) {
+						//cout << i << j << k<<endl;
+						temp_lattice[i][j][k] = -1;
+					}
+
 				}
 			}
 		}
