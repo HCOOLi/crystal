@@ -225,22 +225,26 @@ class pyRoom(Room):
     def py_cal_thickness(self):
         thicknesslist = self.cal_thickness()
         plot_list = []
+        sort_list = []
         for lammellar in thicknesslist:
             if lammellar:
                 a = lammellar[0] - lammellar[3]
                 b = lammellar[1] - lammellar[4]
                 c = lammellar[2] - lammellar[5]
-                self.new_draw_box([lammellar[0], lammellar[1], lammellar[2]],
-                                  [lammellar[3], lammellar[4], lammellar[5]],
-                                  'red')
+                # self.new_draw_box([lammellar[0], lammellar[1], lammellar[2]],
+                #                   [lammellar[3], lammellar[4], lammellar[5]],
+                #                   'red')
                 plot_list.append([(a + b) / 2, c])
+                sort_list.append(c)
+        sort_list.sort(reverse=True)
 
-        plt.figure()
-        plt.title('Ep=%f,Eb=%f,length=%f  ' % (self.Ep, self.Eb, self.shape[2]))
-        plt.xlabel('(a+b)/2')
-        plt.ylabel('c')
-        plt.scatter(x=np.asarray(plot_list)[:, 0], y=np.asarray(plot_list)[:, 1])
-        plt.show()
+        # plt.figure()
+        # plt.title('Ep=%f,Eb=%f,length=%f  ' % (self.Ep, self.Eb, self.shape[2]))
+        # plt.xlabel('(a+b)/2')
+        # plt.ylabel('c')
+        # plt.scatter(x=np.asarray(plot_list)[:, 0], y=np.asarray(plot_list)[:, 1])
+        # plt.show()
+        return np.mean(np.asarray(sort_list[:5]))
 
 
 def reconstruct(parameter):
@@ -253,17 +257,18 @@ def reconstruct(parameter):
         # loadpath = "chain%d/chain-%3.2f,%3.2f,%3.2f,%d-annealed in%3.2f.json" % \
         #            (length, Ep, Eb, T, k, T_anneal)
     else:
-        loadpath = "steps%d/chain%d/chain-%d,%d,%d,%d.json" % (steps,length, Ep * 10, Eb * 10, T * 10, k)
-        # loadpath = "chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k)
+        # loadpath = "steps%d/chain%d/chain-%d,%d,%d,%d.json" % (steps,length, Ep * 10, Eb * 10, T * 10, k)
+        loadpath = "steps%d/chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (steps, length, Ep, Eb, T, k)
 
 
     try:
-        print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
-        r = pyRoom(32, 32, length, Ep=Ep, b2a=0, Eb=Eb)
+        print('Run task steps=%d Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (steps, Ep, Eb, T, length, os.getpid()))
+        r = pyRoom(24, 24, length, Ep=Ep, b2a=0, Eb=Eb)
         r.construct_by_pylist(r.load_polymer(filepath=loadpath))
-        r.draw(path=loadpath)
-        r.py_cal_thickness()
-        r.cal_crystal()
+        # r.draw(path=loadpath)
+        print(r.py_cal_thickness())
+
+        # r.cal_crystal()
 
 
 

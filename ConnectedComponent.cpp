@@ -111,7 +111,7 @@ namespace matrix {
 					if (label[i][j][k] == 0) {
 						if (bitmap[i][j][k] == -1) {
 							count_1++;
-							if (count_1>5) {
+							if (count_1>10) {
 								for (int i = 0; i < bitmap.shape[0]; i++) {
 									for (int j = 0; j < bitmap.shape[1]; j++) {
 										label[i][j][k] = -1;
