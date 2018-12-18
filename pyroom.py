@@ -88,10 +88,15 @@ class pyRoom(Room):
 
                 pass
 
-    def remove_c_layer(self, k):
-        for i in self.c_layer[k]:
-            self.delete_chain(i)
+    def remove_c_layer(self):
 
+        for k in range(0, int(self.shape[2] * 3 / 4), 2):
+            for i in self.c_layer[k]:
+                self.delete_chain(i)
+            yield
+        return
+        #   for i in self.c_layer[k]:
+        #       self.delete_chain(i)
     def remove_a_layer(self, k):
         if k >= self.shape[0]:
             return
@@ -122,10 +127,10 @@ class pyRoom(Room):
         from vpython import canvas, vector, curve, color
         # def into_vector(a):
         #     return vector(a[0], a[1], a[2])
-
+        print("draw a box")
         p1 = [0, 0, 0]
         p2 = [0, 0, 0]
-        radius = 0.05
+        radius = 0.08
         if box_color == 'blue':
             box_color = color.blue
         if box_color == 'red':
@@ -224,6 +229,7 @@ class pyRoom(Room):
 
     def py_cal_thickness(self):
         thicknesslist = self.cal_thickness()
+        print(thicknesslist)
         plot_list = []
         sort_list = []
         for lammellar in thicknesslist:
@@ -231,19 +237,19 @@ class pyRoom(Room):
                 a = lammellar[0] - lammellar[3]
                 b = lammellar[1] - lammellar[4]
                 c = lammellar[2] - lammellar[5]
-                # self.new_draw_box([lammellar[0], lammellar[1], lammellar[2]],
-                #                   [lammellar[3], lammellar[4], lammellar[5]],
-                #                   'red')
+                self.new_draw_box([lammellar[0], lammellar[1], lammellar[2]],
+                                  [lammellar[3], lammellar[4], lammellar[5]],
+                                  'red')
                 plot_list.append([(a + b) / 2, c])
                 sort_list.append(c)
         sort_list.sort(reverse=True)
 
-        # plt.figure()
-        # plt.title('Ep=%f,Eb=%f,length=%f  ' % (self.Ep, self.Eb, self.shape[2]))
-        # plt.xlabel('(a+b)/2')
-        # plt.ylabel('c')
-        # plt.scatter(x=np.asarray(plot_list)[:, 0], y=np.asarray(plot_list)[:, 1])
-        # plt.show()
+        plt.figure()
+        plt.title('Ep=%f,Eb=%f,length=%f  ' % (self.Ep, self.Eb, self.shape[2]))
+        plt.xlabel('(a+b)/2')
+        plt.ylabel('c')
+        plt.scatter(x=np.asarray(plot_list)[:, 0], y=np.asarray(plot_list)[:, 1])
+        plt.show()
         return np.mean(np.asarray(sort_list[:5]))
 
 
@@ -265,7 +271,7 @@ def reconstruct(parameter):
         print('Run task steps=%d Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (steps, Ep, Eb, T, length, os.getpid()))
         r = pyRoom(24, 24, length, Ep=Ep, b2a=0, Eb=Eb)
         r.construct_by_pylist(r.load_polymer(filepath=loadpath))
-        # r.draw(path=loadpath)
+        r.draw(path=loadpath)
         print(r.py_cal_thickness())
 
         # r.cal_crystal()
@@ -319,19 +325,29 @@ def washing_small(parameter):
             os.mkdir('steps%d' % steps)
         if not os.path.exists('steps%d/chain%d' % (steps, length)):
             os.mkdir('steps%d/chain%d' % (steps, length))
-        for k in range(0, int(3 * r.shape[2] / 4), 4):
-            r.remove_c_layer(k)
-            r.remove_c_layer(k + 2)
+        k = 0
+        for i, _ in enumerate(r.remove_c_layer()):
+            if (i % 4) == 0:
+                k = i * 2
+                r.movie(steps, 20000, T)
+                print("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k))
+                if k % 24 == 0:
+                    r.save("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k))
+                pass
+            # r.remove_c_layer(k)
+            # r.remove_c_layer(k + 2)
             # r.remove_c_layer(k + 4)
             # r.remove_c_layer(k + 6)
+        # for k in range(0, int(3 * r.shape[2] / 4), 4):
+        #     r.remove_c_layer(k)
+        #     r.remove_c_layer(k + 2)
+        #     # r.remove_c_layer(k + 4)
+        #     # r.remove_c_layer(k + 6)
             #     # r.remove_c_layer(k + 8)
             #     # r.remove_c_layer(k + 10)
             #     # r.remove_c_layer(k + 12)
             # r.draw()
-            r.movie(steps, 20000, T)
-            print("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k))
-            if k % 24 == 0:
-                r.save("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k))
+
         r.save("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, int(3 * r.shape[2] / 4) - 4))
         end = time.time()
         print('Task%fruns %0.2f seconds.' % (Ep, (end - start)))
