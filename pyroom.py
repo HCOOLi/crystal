@@ -183,8 +183,7 @@ class pyRoom(Room):
     def step_heating(self, start, end, step, EC_max):
         E_list, Ec_list, Ep_list, t_list = [], [], [], []
         for i in np.arange(start, end, step):
-            print(i)
-            self.movie(1000, 5, i)
+            self.movie(100000, 500, i)
             E, Ec, Ep = self.get_result()
             E_list += E
             Ec_list += Ec
@@ -240,13 +239,13 @@ class pyRoom(Room):
                 self.new_draw_box([lammellar[0], lammellar[1], lammellar[2]],
                                   [lammellar[3], lammellar[4], lammellar[5]],
                                   'red')
-                plot_list.append([(a + b) / 2, c])
+                plot_list.append([b, c])
                 sort_list.append(c)
         sort_list.sort(reverse=True)
 
         plt.figure()
         plt.title('Ep=%f,Eb=%f,length=%f  ' % (self.Ep, self.Eb, self.shape[2]))
-        plt.xlabel('(a+b)/2')
+        plt.xlabel('a')
         plt.ylabel('c')
         plt.scatter(x=np.asarray(plot_list)[:, 0], y=np.asarray(plot_list)[:, 1])
         plt.show()
@@ -264,7 +263,8 @@ def reconstruct(parameter):
         #            (length, Ep, Eb, T, k, T_anneal)
     else:
         # loadpath = "steps%d/chain%d/chain-%d,%d,%d,%d.json" % (steps,length, Ep * 10, Eb * 10, T * 10, k)
-        loadpath = "steps%d/chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (steps, length, Ep, Eb, T, k)
+        # loadpath = "k=4/steps%d/chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (steps, length, Ep, Eb, T, k)
+        loadpath = "k=4/steps%d/chain%d/chain-%3.2f,%3.2f,%3.2fend.json" % (steps, length, Ep, Eb, T)
 
 
     try:
@@ -334,19 +334,6 @@ def washing_small(parameter):
                 if k % 24 == 0:
                     r.save("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k))
                 pass
-            # r.remove_c_layer(k)
-            # r.remove_c_layer(k + 2)
-            # r.remove_c_layer(k + 4)
-            # r.remove_c_layer(k + 6)
-        # for k in range(0, int(3 * r.shape[2] / 4), 4):
-        #     r.remove_c_layer(k)
-        #     r.remove_c_layer(k + 2)
-        #     # r.remove_c_layer(k + 4)
-        #     # r.remove_c_layer(k + 6)
-            #     # r.remove_c_layer(k + 8)
-            #     # r.remove_c_layer(k + 10)
-            #     # r.remove_c_layer(k + 12)
-            # r.draw()
 
         r.save("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, int(3 * r.shape[2] / 4) - 4))
         end = time.time()
@@ -390,33 +377,23 @@ def washing_small_a_b(parameter):
     return
 
 
-def step_heating(Ec0, Ep0, Eb0, T0):
+def step_heating(parameter):
     # try:
-    print('Run task %f ,%f,%f(%s)...' % (Ec0, Ep0, T0, os.getpid()))
+    Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
+    print('Run task %f ,%f,%f(%s)...' % (Ep, Eb, T, os.getpid()))
     start = time.time()
+    EC_max = 16 * 16 * (96 - 1)
 
-    r0 = pyRoom(32, 64, 32, Ec=1, Ep=3, b2a=0, Eb=3)
-    num_of_chains = 16 * 16
-    chain_length = 64
-    EC_max = num_of_chains * (chain_length - 1)
-    r0.py_inputECC(num_of_chains, chain_length)
-    print(r0.cal_Ep())
+    r = pyRoom(32, 32, 128, Ep=Ep, Eb=Eb)
+    r.py_inputECC_with_small()
+    for _ in r.remove_c_layer():
+        pass
+    print("removed all")
+    E_list, Ec_list, Ep_list, t_list, f = r.step_heating(1 * Ep, 6 * Ep, 0.1 * Ep, EC_max)
+    plt.plot(t_list, f)
+    plt.savefig("stepheating,")
 
-    r = pyRoom(32, 32, 128, Ec=1, Ep=3, b2a=0, Eb=3)
 
-    # r.py_inputECC2(16*16,31)
-    # r.draw()
-    # r.py_inputECC_with_small()
-
-    r.construct_by_pylist(r.load_polymer("chain/chain-%d,%d,%d,%d.json" % (3 * 10, 10, 12, 60)))
-    r.draw()
-    thicka, thickb, thickc = r.cal_thick_by_point()
-    r
-    print(r.cal_Ep())
-    print(r.cal_Ec() / EC_max)
-    # print(thicka),print(thickb),print(thickc)
-    plt.hist(thickc)
-    plt.show()
 
     return
 
