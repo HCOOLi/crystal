@@ -148,7 +148,7 @@ public:
 		Eb_matrix[0][0] = 0;
 		Eb_matrix[0][1] = -Eb;
 		Eb_matrix[1][0] = -Eb;
-		Eb_matrix[1][1] = Eb;
+		Eb_matrix[1][1] = 0;
 		results = new py::list();
 		initmoves();
 		srand(1);

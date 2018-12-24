@@ -330,8 +330,9 @@ def washing_small(parameter):
             if (i % 4) == 0:
                 k = i * 2
                 r.movie(steps, 20000, T)
-                print("steps%d/chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (steps, length, Ep, Eb, T, k))
+
                 if k % 24 == 0:
+                    print("steps%d/chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (steps, length, Ep, Eb, T, k))
                     r.save("steps%d/chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (steps, length, Ep, Eb, T, k))
                 pass
 
