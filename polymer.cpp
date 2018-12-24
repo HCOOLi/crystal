@@ -300,6 +300,7 @@ void Room::localSnakeMove(int i, stack<vec> &path)
 {
 	int length = polymer_list[i].length;
 	if (length == 0)return;
+	if (polymer_list[i][0]->movable == 1) return;
 	int start_point = rand() % length;
 	polymer_iter pol_iter(polymer_list[i][start_point]);
 	vec p1, p2;
