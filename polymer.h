@@ -150,13 +150,19 @@ public:
 		Eb_matrix[1][0] = -Eb;
 		Eb_matrix[1][1] = Eb;
 		//TODO
-		Eb_matrix.resize(3);
-		Eb_matrix[0].resize(3);
-		Eb_matrix[1].resize(3);
-		Eb_matrix[0][0] = 0;
-		Eb_matrix[0][1] = 0;
-		Eb_matrix[1][0] = 0;
-		Eb_matrix[1][1] = Ep;
+		Ep_matrix.resize(3);
+		Ep_matrix[0].resize(3);
+		Ep_matrix[1].resize(3);
+		Ep_matrix[2].resize(3);
+		Ep_matrix[0][0] = 0;
+		Ep_matrix[0][1] = 0;
+		Ep_matrix[2][0] = 0;
+		Ep_matrix[0][2] = 0;
+		Ep_matrix[1][0] = 0;
+		Ep_matrix[1][1] = 1;
+		Ep_matrix[1][2] = 0.1;
+		Ep_matrix[2][1] = 0.1;
+		Ep_matrix[2][2] = 0.01;
 
 		results = new py::list();
 		initmoves();

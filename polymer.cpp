@@ -41,6 +41,8 @@ inline vec Room::cal_direction(const vec & point1, const vec & point2)const
 
 void Room::input_one_ECC(vec init, int length, int direction,int movable)
 {
+	int type = rand() % 2+1;
+	cout << type;
 	try {
 		Polymer p;
 		p.chain.resize(length);
@@ -49,7 +51,7 @@ void Room::input_one_ECC(vec init, int length, int direction,int movable)
 		for (int j = 0; j < length; j++) {
 			vec point(init);
 			point[direction] += j;
-			p[j] = set_point(point, chain_num, j, 1,movable);
+			p[j] = set_point(point, chain_num, j, type,movable);
 		}
 		p.construct();
 		polymer_list.emplace_back(move(p));
@@ -446,7 +448,7 @@ double Room::cal_dEp(deque<vec > &path)const
 	iter++;
 	while (iter != path.end()) {
 		v2 = (*iter);
-		num += count_parallel_B(v1, v2, path, 1);
+		num += count_parallel(v1, v2, path, 1);
 		v1 = v2;
 		iter++;
 	} 
@@ -725,6 +727,8 @@ double Room::count_parallel_nearby_all(vec &point1, vec &point2,
 		if (result == -1) { continue; }
 		else {
 			int type2 = lattice[p1]->type;
+			/*cout << type1 << type2;*/
+
 			double Ep12 = Ep_matrix[type1][type2];
 			if (result == chain_num) {
 				
