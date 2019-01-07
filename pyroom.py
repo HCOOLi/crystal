@@ -183,12 +183,12 @@ class pyRoom(Room):
     def step_heating(self, start, end, step, EC_max):
         E_list, Ec_list, Ep_list, t_list = [], [], [], []
         for i in np.arange(start, end, step):
-            self.movie(100000, 500, i)
-            E, Ec, Ep = self.get_result()
+            self.movie(100000, 5000, i)
+            E, Ec, Ep, Eb = self.get_result()
             E_list += E
             Ec_list += Ec
             Ep_list += Ep
-            t_list += [i] * 200
+            t_list += [i] * 20
             # self.save(i, i*1000)
         f = []
         for i in Ec_list:
@@ -245,7 +245,7 @@ class pyRoom(Room):
 
         plt.figure()
         plt.title('Ep=%f,Eb=%f,length=%f  ' % (self.Ep, self.Eb, self.shape[2]))
-        plt.xlabel('a')
+        plt.xlabel('b')
         plt.ylabel('c')
         plt.scatter(x=np.asarray(plot_list)[:, 0], y=np.asarray(plot_list)[:, 1])
         plt.show()
@@ -330,12 +330,12 @@ def washing_small(parameter):
             if (i % 4) == 0:
                 k = i * 2
                 r.movie(steps, 20000, T)
-                print("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k))
+                print("steps%d/chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (steps, length, Ep, Eb, T, k))
                 if k % 24 == 0:
-                    r.save("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, k))
+                    r.save("steps%d/chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (steps, length, Ep, Eb, T, k))
                 pass
 
-        r.save("chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (length, Ep, Eb, T, int(3 * r.shape[2] / 4) - 4))
+        r.save("steps%d/chain%d/chain-%3.2f,%3.2f,%3.2fend.json" % (steps, length, Ep, Eb, T))
         end = time.time()
         print('Task%fruns %0.2f seconds.' % (Ep, (end - start)))
     except Exception as e:
@@ -378,20 +378,25 @@ def washing_small_a_b(parameter):
 
 
 def step_heating(parameter):
-    # try:
-    Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
-    print('Run task %f ,%f,%f(%s)...' % (Ep, Eb, T, os.getpid()))
-    start = time.time()
-    EC_max = 16 * 16 * (96 - 1)
+    try:
+        Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
+        print('Run task %f ,%f,%f(%s)...' % (Ep, Eb, T, os.getpid()))
+        start = time.time()
+        EC_max = 16 * 16 * (96 - 1)
 
-    r = pyRoom(32, 32, 128, Ep=Ep, Eb=Eb)
-    r.py_inputECC_with_small()
-    for _ in r.remove_c_layer():
-        pass
-    print("removed all")
-    E_list, Ec_list, Ep_list, t_list, f = r.step_heating(1 * Ep, 6 * Ep, 0.1 * Ep, EC_max)
-    plt.plot(t_list, f)
-    plt.savefig("stepheating,")
+        r = pyRoom(32, 32, length, Ep=Ep, Eb=Eb)
+        r.py_inputECC_with_small()
+        for _ in r.remove_c_layer():
+            pass
+        print("removed all")
+        E_list, Ec_list, Ep_list, t_list, f = r.step_heating(6 * Ep, 1 * Ep, -0.1 * Ep, EC_max)
+        plt.plot(t_list, f)
+        plt.savefig("stepheating%3.2f,%3.2f.png" % (Ep, Eb))
+        plt.show()
+
+    except Exception as e:
+        print(e)
+        raise e
 
 
 
