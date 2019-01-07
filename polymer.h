@@ -128,20 +128,20 @@ public:
 	vector< vec > moves;
 	set<int> move_set;
 	//parameters
-	const double Ec0;
-	const double Ep0;
-	const double b2a;
-	const double b2b;
-	const double b2c;
+	const double Ec0=1.0;
+	vector<vector<double> > Eb_matrix;
+	vector<vector<double> > Ep_matrix;
+	//const double b2a;
+	//const double b2b;
+	//const double b2c;
 
 	vector<Polymer> polymer_list;
-	vector<vector<double> > Eb_matrix;
 
 	py::list *results;
 
 
 	//initiate
-	Room(int x, int y, int z, double Ec = 1, double Ep = 1, double b2a = 0, double b2b = 0, double b2c = 0,double Eb=0) : lattice(x, y, z), Ec0(Ec), Ep0(Ep), shape(vec{ x,y,z }), b2a(b2a), b2b(b2b), b2c(b2c) {
+	Room(int x, int y, int z, double Ep = 1, double Eb=0) : lattice(x, y, z),shape(vec{ x,y,z }) {
 		Eb_matrix.resize(2);
 		Eb_matrix[0].resize(2);
 		Eb_matrix[1].resize(2);
@@ -149,12 +149,22 @@ public:
 		Eb_matrix[0][1] = -Eb;
 		Eb_matrix[1][0] = -Eb;
 		Eb_matrix[1][1] = Eb;
+		//TODO
+		Eb_matrix.resize(3);
+		Eb_matrix[0].resize(3);
+		Eb_matrix[1].resize(3);
+		Eb_matrix[0][0] = 0;
+		Eb_matrix[0][1] = 0;
+		Eb_matrix[1][0] = 0;
+		Eb_matrix[1][1] = Ep;
+
 		results = new py::list();
 		initmoves();
 		srand(1);
 	}
-	shared_ptr< Point>set_point(vec location, int chain_num, int pos_in_chain, int movable);
 	void initmoves();
+
+	shared_ptr<Point> set_point(vec location, int chain_num, int pos_in_chain, int type, int movable);
 
 	//some useful functions
 	bool intersect(vec &point1, vec &point2)const;
