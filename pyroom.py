@@ -9,13 +9,11 @@ from crystal import Room
 
 
 class pyRoom(Room):
-    def __init__(self, a, b, c, Ec=1.0, Ep=1.0, b2a=0.0, Eb=0.0):
-        Room.__init__(self, int(a), int(b), int(c), float(Ec), Ep, b2a, 0.0, 0.0, Eb)
+    def __init__(self, a, b, c, Ep=1.0, Eb=0.0):
+        Room.__init__(self, int(a), int(b), int(c), Ep, Eb)
         self.shape = np.asarray([a, b, c])
-        self.Ec = Ec
         self.Ep = Ep
         self.Eb = Eb
-        self.b2a = b2a
 
     def py_input_one_ECC(self, a, length, direction, ty):
         # int x,int y,int z, int length, int direction, int type
@@ -155,19 +153,27 @@ class pyRoom(Room):
         scene = canvas(title=path, width=800, height=800,
                        center=vector(self.shape[0] / 2, self.shape[1] / 2, self.shape[2] / 2), background=color.white)
         self.draw_box()
-        if polylist == None:
-            polylist = self.get_list()
-        for chain in polylist:
-            c = curve(color=color.yellow, radius=0.2)
+        nums = self.get_num_of_polymers()
+        for i in range(nums):
+            chain = self.get_polymer(i)
+            chaintype = chain.get_type()
+            # print(chaintype)
+
+            # for chain in polylist:
+            if chaintype == 1:
+                this_color = color.yellow
+            else:
+                this_color = color.blue
+            c = curve(color=this_color, radius=0.2)
             if chain:
-                point2 = chain[0].copy()
+                point2 = chain.get_list()[0].copy()
             else:
                 continue
-            for point in chain:
-                if (self.ifp1p2(point2, point)):
+            for point in chain.get_list():
+                if (self.if_out_of_range(point2, point)):
                     pass
                 else:
-                    c = curve(color=color.yellow, radius=0.2)
+                    c = curve(color=this_color, radius=0.2)
                 c.append(vector(point[0], point[1], point[2]))
                 point2 = point.copy()
         return scene
@@ -195,7 +201,7 @@ class pyRoom(Room):
             f.append(-i / EC_max)
         return E_list, Ec_list, Ep_list, t_list, f
 
-    def ifp1p2(self,point2, point1):
+    def if_out_of_range(self, point2, point1):
         for i in range(3):
             if (abs(point2[i] - point1[i]) > 1):
                 return False
@@ -204,7 +210,7 @@ class pyRoom(Room):
 
     def cal_crystal(self):
 
-        r0 = pyRoom(self.shape[0], self.shape[2], self.shape[1], Ec=1, Ep=self.Ep, b2a=0, Eb=self.Eb)
+        r0 = pyRoom(self.shape[0], self.shape[2], self.shape[1], Ep=self.Ep, Eb=self.Eb)
         num_of_chains = self.shape[0] * self.shape[1] / 4
         chain_length = self.shape[2] / 4 * 3
         EC_max = num_of_chains * (chain_length - 1)
@@ -269,7 +275,7 @@ def reconstruct(parameter):
 
     try:
         print('Run task steps=%d Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (steps, Ep, Eb, T, length, os.getpid()))
-        r = pyRoom(24, 24, length, Ep=Ep, b2a=0, Eb=Eb)
+        r = pyRoom(24, 24, length, Ep=Ep, Eb=Eb)
         r.construct_by_pylist(r.load_polymer(filepath=loadpath))
         r.draw(path=loadpath)
         print(r.py_cal_thickness())
@@ -297,7 +303,7 @@ def anneal(parameter):
                (length, Ep, Eb, T, k, T_anneal)
     try:
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
-        r = pyRoom(32, 32, length, Ep=Ep, b2a=0, Eb=Eb)
+        r = pyRoom(32, 32, length, Ep=Ep, Eb=Eb)
         r.construct_by_pylist(r.load_polymer(loadpath))
 
         r.movie(30000 * int(length / 12), 20000, T_anneal)
@@ -319,7 +325,7 @@ def washing_small(parameter):
         print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
         start = time.time()
 
-        r = pyRoom(24, 24, length, Ep=Ep, b2a=0, Eb=Eb)
+        r = pyRoom(24, 24, length, Ep=Ep, Eb=Eb)
         r.py_inputECC_with_small()
         if not os.path.exists('steps%d' % steps):
             os.mkdir('steps%d' % steps)
@@ -353,7 +359,7 @@ def washing_small_a_b(parameter):
     print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
     start = time.time()
 
-    r = pyRoom(32, 32, 128, Ec=1, Ep=Ep, b2a=0, Eb=Eb)
+    r = pyRoom(32, 32, 128, Ep=Ep, Eb=Eb)
     EC_max = 16 * 16 * (64 - 1)
     r.py_inputECC_with_small()
 
@@ -362,7 +368,7 @@ def washing_small_a_b(parameter):
         r.remove_a_layer(k + 1)
         r.remove_b_layer(k)
         r.remove_b_layer(k + 1)
-        r.remove_c_layer(k)
+        r.remove_c_layer()
         # r.remove_c_layer(k + 2)
         #     # r.remove_c_layer(k + 4)
         #     # r.remove_c_layer(k + 6)
@@ -402,12 +408,6 @@ def step_heating(parameter):
 
 
     return
-
-def draw_picture(Ep, Eb, T, k):
-    r = pyRoom(32, 32, 128, Ec=1, Ep=1, b2a=0)
-    filepath = "chain/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T, k)
-    polymerlist = r.load_polymer(filepath)
-    scence = r.draw(polymerlist, filepath)
 
 
 

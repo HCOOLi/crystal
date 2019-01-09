@@ -4,9 +4,17 @@
 
 namespace py=boost::python;
 
+
+
 BOOST_PYTHON_MODULE(crystal)
 {
-	py::class_<Room>("Room", py::init<int, int, int, py::optional<double,double,double,double,double,double> >())
+	py::class_<Point>("Point");
+
+	py::class_<Polymer>("Polymer")
+		.def("get_type", &Polymer::get_type)
+		.def("get_list", &Polymer::get_list)
+		;
+	py::class_<Room>("Room", py::init<int, int, int, py::optional<double,double> >())
 		.def("inputECC", &Room::inputECC)
 		.def("input_one_ECC", &Room::py_input_one_ECC)
 		.def("input_stop_chain",&Room::input_stop_chain)
@@ -21,5 +29,8 @@ BOOST_PYTHON_MODULE(crystal)
 		.def("cal_Ep",&Room::cal_Ep)
 		.def("ca_Eb",&Room::cal_Eb)
 		.def("get_result",&Room::get_result)
+		.def("get_polymer",&Room::get_polymer, py::return_internal_reference<>())
+		.def("get_num_of_polymers",&Room::num_of_polymers)
 		;
+
 }

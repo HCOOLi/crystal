@@ -2,7 +2,7 @@
 # It's just for the hints of IDE
 
 class Room():
-    def __init__(self, a, b, c, Ec, Ep, b2a, b2b, b2c, Eb):
+    def __init__(self, a, b, c, Ep, Eb):
         pass
 
     def get_list(self):
