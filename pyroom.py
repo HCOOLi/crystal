@@ -15,9 +15,9 @@ class pyRoom(Room):
         self.Ep = Ep
         self.Eb = Eb
 
-    def py_input_one_ECC(self, a, length, direction, ty):
+    def py_input_one_ECC(self, a, length, direction, ty, movable):
         # int x,int y,int z, int length, int direction, int type
-        self.input_one_ECC(int(a[0]), int(a[1]), int(a[2]), int(length), int(direction), int(ty))
+        self.input_one_ECC(int(a[0]), int(a[1]), int(a[2]), int(length), int(direction), int(ty), int(movable))
 
     def py_inputECC(self, num, length):
 
@@ -77,11 +77,11 @@ class pyRoom(Room):
                         self.a_layer[i].append(num)
                         self.b_layer[j].append(num)
                         self.c_layer[k].append(num)
-                        self.py_input_one_ECC([i, j, k + int(self.shape[2] / 8)], 2, 2, 1)
+                        self.py_input_one_ECC([i, j, k + int(self.shape[2] / 8)], 2, 2, 2, 0)
 
                         num += 1
                 else:
-                    self.py_input_one_ECC([i, j, int(self.shape[2] / 8)], int(3 * self.shape[2] / 4), 2, 0)
+                    self.py_input_one_ECC([i, j, int(self.shape[2] / 8)], int(3 * self.shape[2] / 4), 2, 1, 0)
                     num += 1
 
                 pass
@@ -379,11 +379,30 @@ def washing_small_a_b(parameter):
         r.save("chainabc/chain-%d,%d,%d,%d.json" % (Ep * 10, Eb * 10, T * 10, k))
 
     end = time.time()
-    print('Task%f ,%fruns %0.2f seconds.' % (Ec, Ep, (end - start)))
+    print('Task%f ,%fruns %0.2f seconds.' % (Ep, (end - start)))
 
     return
 
 
+def Inclusion_Complex(parameter):
+    Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
+
+    # try:
+    print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
+    start = time.time()
+
+    r = pyRoom(32, 32, 128, Ep=Ep, Eb=Eb)
+    r.py_inputECC_with_small()
+
+    r.movie(10000, 1, 10)
+    ###########################
+    r.movie(100000, 1, T)
+    r.save("Complex/chain-%3.2f.json" % (T))
+
+    end = time.time()
+    print('Task%f runs %0.2f seconds.' % (T, (end - start)))
+
+    return
 def step_heating(parameter):
     try:
         Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]

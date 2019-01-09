@@ -151,10 +151,10 @@ public:
 		Ep_matrix[2][0] = 0;
 		Ep_matrix[0][2] = 0;
 		Ep_matrix[1][0] = 0;
-		Ep_matrix[1][1] = 1;
+		Ep_matrix[1][1] = 0.5;
 		Ep_matrix[1][2] = 2;
 		Ep_matrix[2][1] = 2;
-		Ep_matrix[2][2] = 1;
+		Ep_matrix[2][2] = 0.5;
 
 		results = new py::list();
 		initmoves();
