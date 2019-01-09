@@ -9,7 +9,7 @@ class Point //A point class
 public:
 	int chain_num;
 	int pos_in_chain;
-	int movable;
+	int movable;//0可以移动,1不可以移动
 	int type;
 	vec location;
 	shared_ptr< Point> pre = nullptr;

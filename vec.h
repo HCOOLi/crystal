@@ -66,11 +66,27 @@ inline ostream& operator<<(ostream&o, const vec &a) {
 	o << '<' << a[0] << "," << a[1] << ',' << a[2] << '>';
 	return o;
 }
+inline bool if_opposite(const vec & a, const vec & b) {
+	for (int i = 0; i < 3; i++) {
+		if (a[i] + b[i]!=0)
+		{
+			return false;
+		}
+	}
+	return true;
+}
 inline  vec operator%(const vec & a, const vec & b)
 {
 	vec v;
 	for (int i = 0; i < 3; i++) {
-		v[i] = (a[i] + b[i]) % b[i];
+		if (a[i] >= b[i]) {
+			v[i] = a[i] % b[i];
+		}
+		else if (a[i] < 0) {
+			v[i] = a[i] + b[i];
+		}else{
+			v[i] = a[i];
+		}
 	}
 	return v;
 }

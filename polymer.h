@@ -16,46 +16,28 @@ inline double randfloat() {//generate a random float
 }
 
 
-class polymer_iter {//of no use
-public:
-	shared_ptr< Point> point;
-	polymer_iter(shared_ptr< Point> p) :point(p) {}
-	Point&operator*() { return *point; }
-	shared_ptr< Point> operator->() { return point; }
-	void operator++(int) {
-		if (point->next == nullptr) {
-			//cout << "nullptr pointer";
-		}
-		point = point->next;
-	}
-	void operator--(int) {
-		if (point->pre == nullptr) {
-			//cout << "nullptr pointer";
-		}
-		point = point->pre;
-	}
-	polymer_iter operator+(int n);
-	polymer_iter operator-(int n);
-};
-
 class Polymer {//a polymer 
 public:
 	vector<shared_ptr< Point>> chain;
 	int length;
+	int type=1;
 
 	Polymer() {};
 	Polymer(const Polymer & p) {
 		chain = p.chain;
 		length = p.length;
+		type = p.type;
 	};
 	Polymer & operator=(const Polymer & p) {
 		chain = p.chain;
 		length = p.length;
+		type = p.type;
 		return *this;
 	}
 	Polymer & operator=(Polymer && p) {
 		chain = move(p.chain);
 		length = p.length;
+		type = p.type;
 		p.chain.clear();
 		p.length = 0;
 		return *this;
@@ -66,10 +48,14 @@ public:
 		length = p.length;
 
 		p.chain.clear();
+		type = p.type;
 		p.length = 0;
 	};
 
 	Polymer(int l) : length(l) {}
+	int get_type() {
+		return type;
+	}
 
 
 	shared_ptr< Point>&operator[](int i) { return chain[i]; }
@@ -81,6 +67,9 @@ public:
 			a.append(chain[i]->get_list());
 		}
 		return a;
+	}
+	Point &  get_polymer(int i) {
+		return *chain[i];
 	}
 };
 ostream & operator<<(ostream & o, Polymer& p);
@@ -94,17 +83,17 @@ public:
 	Grid() {};
 
 	shared_ptr< Point>  & operator[](const vec &P) {
-		const static vec b{ 0,0,0 };
-		if (P < b || P >= shape) {
-			throw WrongPoint(__FUNCTION__, P);
-		}
+		//const static vec b{ 0,0,0 };
+		//if (P < b || P >= shape) {
+		//	throw WrongPoint(__FUNCTION__, P);
+		//}
 		return lattice[P[0]][P[1]][P[2]];
 	}
 	shared_ptr< Point>   operator[](const vec &P)const {
-		const static vec b{ 0,0,0 };
-		if (P<b || P>shape) {
-			throw WrongPoint(__FUNCTION__, P);
-		}
+		//const static vec b{ 0,0,0 };
+		//if (P<b || P>shape) {
+		//	throw WrongPoint(__FUNCTION__, P);
+		//}
 		return lattice[P[0]][P[1]][P[2]];
 	}
 	void thread_yz(int i, int y, int z);
@@ -138,6 +127,9 @@ public:
 	vector<Polymer> polymer_list;
 
 	py::list *results;
+	Polymer &  get_polymer(int i) {
+		return polymer_list[i];
+	}
 
 
 	//initiate
@@ -160,9 +152,9 @@ public:
 		Ep_matrix[0][2] = 0;
 		Ep_matrix[1][0] = 0;
 		Ep_matrix[1][1] = 1;
-		Ep_matrix[1][2] = 0.1;
-		Ep_matrix[2][1] = 0.1;
-		Ep_matrix[2][2] = 0.01;
+		Ep_matrix[1][2] = 2;
+		Ep_matrix[2][1] = 2;
+		Ep_matrix[2][2] = 1;
 
 		results = new py::list();
 		initmoves();
@@ -177,6 +169,10 @@ public:
 	int get_side_num(vec & p1, vec & p2) const;
 	vec cal_direction(const vec & point1, const vec & point2) const;
 
+	void input_one_ECC(vec init, int length, int direction, int type, int movable);
+
+	void py_input_one_ECC(int x, int y, int z, int length, int direction, int type, int movable);
+
 
 
 	double distance_squre(vec &p1, vec &p2)const {
@@ -189,8 +185,6 @@ public:
 	void inputcircle(int num, int length);
 	void input_stop_chain();
 	void input_stop_chain2();
-	void input_one_ECC(vec init, int length, int direction, int movable);
-	void py_input_one_ECC(int x, int y, int z, int length, int direction, int movable);
 	void input_one_circle(vec init, int length, int direction, int movable);
 	void construct_by_pylist(py::list chain_list);
 
@@ -274,6 +268,9 @@ public:
 	py::object get_result() const {
 
 		return py::object(*results);
+	}
+	int num_of_polymers()const {
+		return polymer_list.size();
 	}
 	~Room() {
 
