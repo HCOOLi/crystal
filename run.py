@@ -11,10 +11,10 @@ if __name__ == '__main__':
     print('Parent process %s.' % os.getpid())
     parameter_list = []
 
-    for Ep in [1.3, 1.0]:
-        for Eb in [0, 0.05, 0.1, 0.15]:
-            for length in [192]:
-                for T in [1.5 * Ep, 2.0 * Ep]:
+    for Ep in [1.0]:
+        for Eb in [0.15]:
+            for length in [128]:
+                for T in range(1, 5):
                     for T_anneal in [0]:
                         for steps in [50000]:
                             # step_heating({"Eb": Eb, "Ep": Ep, "length": length, "T": T, "T_anneal": T_anneal, "steps": steps})
@@ -24,7 +24,7 @@ if __name__ == '__main__':
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
         with Pool(10) as p:
-            p.map_async(washing_small, parameter_list)
+            p.map_async(Inclusion_Complex, parameter_list)
             # p.map_async(reconstruct, parameter_list)
             # p.map_async(step_heating, parameter_list)
             # p.map_async(anneal, parameter_list)

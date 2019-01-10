@@ -130,36 +130,60 @@ public:
 	Polymer &  get_polymer(int i) {
 		return polymer_list[i];
 	}
+	Room(int x, int y, int z, py::list Ep, py::list Eb ) : lattice(x, y, z), shape(vec{ x,y,z }) {
+		Ep_matrix.resize(py::len(Ep));
+		for (int i = 0; i < py::len(Ep); i++) {
+			
+			py::list Ep_array = py::extract<py::list>(Ep[i]);
+			Ep_matrix[i].resize(py::len(Ep_array));
+			for (int j = 0; j < py::len(Ep_array); j++) {
+				Ep_matrix[i][j] = py::extract<double>(Ep_array[j]);
+			}
+		}
+		Eb_matrix.resize(py::len(Eb));
+		for (int i = 0; i < py::len(Eb); i++) {
 
-
-	//initiate
-	Room(int x, int y, int z, double Ep = 1, double Eb=0) : lattice(x, y, z),shape(vec{ x,y,z }) {
-		Eb_matrix.resize(2);
-		Eb_matrix[0].resize(2);
-		Eb_matrix[1].resize(2);
-		Eb_matrix[0][0] = 0;
-		Eb_matrix[0][1] = -Eb;
-		Eb_matrix[1][0] = -Eb;
-		Eb_matrix[1][1] = Eb;
+			py::list Eb_array = py::extract<py::list>(Eb[i]);
+			Ep_matrix[i].resize(py::len(Eb_array));
+			for (int j = 0; j < py::len(Eb_array); j++) {
+				Eb_matrix[i][j] = py::extract<double>(Eb_array[j]);
+			}
+		}
 		//TODO
-		Ep_matrix.resize(3);
-		Ep_matrix[0].resize(3);
-		Ep_matrix[1].resize(3);
-		Ep_matrix[2].resize(3);
-		Ep_matrix[0][0] = 0;
-		Ep_matrix[0][1] = 0;
-		Ep_matrix[2][0] = 0;
-		Ep_matrix[0][2] = 0;
-		Ep_matrix[1][0] = 0;
-		Ep_matrix[1][1] = 0.5;
-		Ep_matrix[1][2] = 2;
-		Ep_matrix[2][1] = 2;
-		Ep_matrix[2][2] = 0.5;
-
+		
 		results = new py::list();
 		initmoves();
 		srand(1);
 	}
+
+	//initiate
+	//Room(int x, int y, int z, double Ep = 1, double Eb=0) : lattice(x, y, z),shape(vec{ x,y,z }) {
+	//	Eb_matrix.resize(2);
+	//	Eb_matrix[0].resize(2);
+	//	Eb_matrix[1].resize(2);
+	//	Eb_matrix[0][0] = 0;
+	//	Eb_matrix[0][1] = -Eb;
+	//	Eb_matrix[1][0] = -Eb;
+	//	Eb_matrix[1][1] = Eb;
+	//	//TODO
+	//	Ep_matrix.resize(3);
+	//	Ep_matrix[0].resize(3);
+	//	Ep_matrix[1].resize(3);
+	//	Ep_matrix[2].resize(3);
+	//	Ep_matrix[0][0] = 0;
+	//	Ep_matrix[0][1] = 0;
+	//	Ep_matrix[2][0] = 0;
+	//	Ep_matrix[0][2] = 0;
+	//	Ep_matrix[1][0] = 0;
+	//	Ep_matrix[1][1] = 0.5;
+	//	Ep_matrix[1][2] = 2;
+	//	Ep_matrix[2][1] = 2;
+	//	Ep_matrix[2][2] = 0.5;
+
+	//	results = new py::list();
+	//	initmoves();
+	//	srand(1);
+	//}
 	void initmoves();
 
 	shared_ptr<Point> set_point(vec location, int chain_num, int pos_in_chain, int type, int movable);

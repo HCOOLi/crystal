@@ -9,7 +9,7 @@ from crystal import Room
 
 
 class pyRoom(Room):
-    def __init__(self, a, b, c, Ep=1.0, Eb=0.0):
+    def __init__(self, a, b, c, Ep, Eb):
         Room.__init__(self, int(a), int(b), int(c), Ep, Eb)
         self.shape = np.asarray([a, b, c])
         self.Ep = Ep
@@ -108,7 +108,7 @@ class pyRoom(Room):
             self.delete_chain(i)
 
     def save(self, file_path):
-        parameters = {"Ep": self.Ep, "Ec": self.Ec, "Eb": self.Eb}
+        parameters = {"Ep": self.Ep, "Eb": self.Eb}
         with open(file_path, 'w') as file:
             file.write(json.dumps(self.get_list()))
 
@@ -157,7 +157,7 @@ class pyRoom(Room):
         for i in range(nums):
             chain = self.get_polymer(i)
             chaintype = chain.get_type()
-            # print(chaintype)
+            print(chaintype)
 
             # for chain in polylist:
             if chaintype == 1:
@@ -270,14 +270,15 @@ def reconstruct(parameter):
     else:
         # loadpath = "steps%d/chain%d/chain-%d,%d,%d,%d.json" % (steps,length, Ep * 10, Eb * 10, T * 10, k)
         # loadpath = "k=4/steps%d/chain%d/chain-%3.2f,%3.2f,%3.2f,%d.json" % (steps, length, Ep, Eb, T, k)
-        loadpath = "k=4/steps%d/chain%d/chain-%3.2f,%3.2f,%3.2fend.json" % (steps, length, Ep, Eb, T)
-
+        # loadpath = "k=4/steps%d/chain%d/chain-%3.2f,%3.2f,%3.2fend.json" % (steps, length, Ep, Eb, T)
+        loadpath = "Complex/chain-%3.2f.json" % (T)
 
     try:
         print('Run task steps=%d Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (steps, Ep, Eb, T, length, os.getpid()))
-        r = pyRoom(24, 24, length, Ep=Ep, Eb=Eb)
+        r = pyRoom(32, 32, length, Ep=Ep, Eb=Eb)
         r.construct_by_pylist(r.load_polymer(filepath=loadpath))
-        r.draw(path=loadpath)
+        # r.draw(path=loadpath)
+        r.draw()
         print(r.py_cal_thickness())
 
         # r.cal_crystal()
@@ -390,13 +391,16 @@ def Inclusion_Complex(parameter):
     # try:
     print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
     start = time.time()
+    if not os.path.exists('Complex'):
+        os.mkdir('Complex')
 
-    r = pyRoom(32, 32, 128, Ep=Ep, Eb=Eb)
+    r = pyRoom(16, 16, 16, Ep=[[0, 0, 0], [0, 0.5, 2], [0, 2, 0.5]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     r.py_inputECC_with_small()
 
-    r.movie(10000, 1, 10)
+    r.movie(10000, 1, 15)
     ###########################
-    r.movie(100000, 1, T)
+    r.movie(10000, 1, T)
+    r.draw()
     r.save("Complex/chain-%3.2f.json" % (T))
 
     end = time.time()

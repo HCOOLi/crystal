@@ -14,7 +14,7 @@ BOOST_PYTHON_MODULE(crystal)
 		.def("get_type", &Polymer::get_type)
 		.def("get_list", &Polymer::get_list)
 		;
-	py::class_<Room>("Room", py::init<int, int, int, py::optional<double,double> >())
+	py::class_<Room>("Room", py::init<int, int, int, py::list, py::list >())
 		.def("inputECC", &Room::inputECC)
 		.def("input_one_ECC", &Room::py_input_one_ECC)
 		.def("input_stop_chain",&Room::input_stop_chain)
