@@ -148,16 +148,17 @@ class pyRoom(Room):
         from vpython import canvas, vector, curve, color
         self.new_draw_box([0, 0, 0], self.shape)
 
-    def draw(self, polylist=None, path=None):
+    def draw(self, polylist=None, title=None):
         from vpython import canvas, vector, curve, color
-        scene = canvas(title=path, width=800, height=800,
+
+        scene = canvas(title=title, width=800, height=800,
                        center=vector(self.shape[0] / 2, self.shape[1] / 2, self.shape[2] / 2), background=color.white)
         self.draw_box()
         nums = self.get_num_of_polymers()
         for i in range(nums):
             chain = self.get_polymer(i)
             chaintype = chain.get_type()
-            print(chaintype)
+            # print(chaintype)
 
             # for chain in polylist:
             if chaintype == 1:
@@ -394,14 +395,15 @@ def Inclusion_Complex(parameter):
     if not os.path.exists('Complex'):
         os.mkdir('Complex')
 
-    r = pyRoom(16, 16, 64, Ep=[[0, 0, 0], [0, 0.5, 2], [0, 2, 0.5]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    r = pyRoom(24, 24, 96, Ep=[[0, 0, 0], [0, 0.5, 2], [0, 2, 0.5]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0.2]])
     r.py_inputECC_with_small()
 
-    r.movie(10000, 1, 15)
+    r.movie(200000, 1, 15)
+    r.draw(title="chain-%3.2f.json" % (T))
     ###########################
-    r.movie(100000, 1, T)
-    r.draw()
-    r.save("Complex/chain-%3.2f.json" % (T))
+    r.movie(200000, 1, T)
+    r.draw(title="chain-%3.2f.json" % (T))
+    # r.save("Complex/chain-%3.2f.json" % (T))
 
     end = time.time()
     print('Task%f runs %0.2f seconds.' % (T, (end - start)))

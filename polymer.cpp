@@ -1011,11 +1011,11 @@ double Room::cal_Eb_point(vec & p, int type) const
 {
 	vec point;//some bugs
 	int i, j;
-	i = lattice[p] == nullptr ? 0 : 1;
+	i = lattice[p] == nullptr ? 0 : lattice[p]->type;
 	double sum = 0;
 	for (auto &direc : moves) {
 		point = (p + direc) % shape;
-		j = lattice[point] == nullptr ? 0 : 1;
+		j = lattice[point] == nullptr ? 0 : lattice[point]->type;
 		//cout << i << ',' << j << endl;
 		sum += this->Eb_matrix[i][j];
 		
@@ -1039,12 +1039,12 @@ double Room::cal_Eb_point(vec & p) const
 {
 	vec point;//some bugs
 	int i, j;
-	i = lattice[p] == nullptr ? 0 : 1;
+	i = lattice[p] == nullptr ? 0 : lattice[p]->type;
 	double sum = 0;
 	for (auto &direc : moves) {
 		point = (p + direc) % shape;
-		j = lattice[point] == nullptr ? 0 : 1;
-		if(i==1&&j==1)
+		j = lattice[point] == nullptr ? 0 : lattice[point]->type;
+		if((i*j)!=0)
 			sum += this->Eb_matrix[i][j]/2;
 		else {
 			sum += this->Eb_matrix[i][j];
