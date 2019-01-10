@@ -131,6 +131,7 @@ public:
 		return polymer_list[i];
 	}
 	Room(int x, int y, int z, py::list Ep, py::list Eb ) : lattice(x, y, z), shape(vec{ x,y,z }) {
+		cout << "constructing"<<endl;
 		Ep_matrix.resize(py::len(Ep));
 		for (int i = 0; i < py::len(Ep); i++) {
 			
@@ -140,17 +141,18 @@ public:
 				Ep_matrix[i][j] = py::extract<double>(Ep_array[j]);
 			}
 		}
+		cout << "Ep_matrix"<<endl;
 		Eb_matrix.resize(py::len(Eb));
 		for (int i = 0; i < py::len(Eb); i++) {
 
 			py::list Eb_array = py::extract<py::list>(Eb[i]);
-			Ep_matrix[i].resize(py::len(Eb_array));
+			Eb_matrix[i].resize(py::len(Eb_array));
 			for (int j = 0; j < py::len(Eb_array); j++) {
 				Eb_matrix[i][j] = py::extract<double>(Eb_array[j]);
 			}
 		}
 		//TODO
-		
+		cout << "Eb_matrix"<<endl;
 		results = new py::list();
 		initmoves();
 		srand(1);

@@ -394,12 +394,12 @@ def Inclusion_Complex(parameter):
     if not os.path.exists('Complex'):
         os.mkdir('Complex')
 
-    r = pyRoom(16, 16, 16, Ep=[[0, 0, 0], [0, 0.5, 2], [0, 2, 0.5]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    r = pyRoom(16, 16, 64, Ep=[[0, 0, 0], [0, 0.5, 2], [0, 2, 0.5]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     r.py_inputECC_with_small()
 
     r.movie(10000, 1, 15)
     ###########################
-    r.movie(10000, 1, T)
+    r.movie(100000, 1, T)
     r.draw()
     r.save("Complex/chain-%3.2f.json" % (T))
 
