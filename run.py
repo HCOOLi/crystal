@@ -14,7 +14,7 @@ if __name__ == '__main__':
     for Ep in [1.0]:
         for Eb in [0.15]:
             for length in [128]:
-                for T in np.arange(2, 3, 0.1):
+                for T in np.arange(2.5, 3.5, 0.1):
                     for T_anneal in [0]:
                         for steps in [50000]:
                             # step_heating({"Eb": Eb, "Ep": Ep, "length": length, "T": T, "T_anneal": T_anneal, "steps": steps})

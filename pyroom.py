@@ -81,7 +81,8 @@ class pyRoom(Room):
 
                         num += 1
                 else:
-                    self.py_input_one_ECC([i, j, int(self.shape[2] / 8)], int(3 * self.shape[2] / 4), 2, 1, 0)
+                    # self.py_input_one_ECC([i, j, int(self.shape[2] / 8)], int(3 * self.shape[2] / 4), 2, 1, 0)
+                    self.py_input_one_ECC([i, j, 1], int(self.shape[2] - 2), 2, 1, 0)
                     num += 1
 
                 pass
@@ -125,12 +126,12 @@ class pyRoom(Room):
         from vpython import canvas, vector, curve, color
         # def into_vector(a):
         #     return vector(a[0], a[1], a[2])
-        print("draw a box")
+        # print("draw a box")
         p1 = [0, 0, 0]
         p2 = [0, 0, 0]
-        radius = 0.08
+        radius = 0.04
         if box_color == 'blue':
-            box_color = color.blue
+            box_color = color.black
         if box_color == 'red':
             box_color = color.red
         for a in range(2):
@@ -149,7 +150,7 @@ class pyRoom(Room):
         self.new_draw_box([0, 0, 0], self.shape)
 
     def draw(self, polylist=None, title=None):
-        from vpython import canvas, vector, curve, color
+        from vpython import canvas, vector, curve, color, sphere
 
         scene = canvas(title=title, width=800, height=800,
                        center=vector(self.shape[0] / 2, self.shape[1] / 2, self.shape[2] / 2), background=color.white)
@@ -165,7 +166,7 @@ class pyRoom(Room):
                 this_color = color.yellow
             else:
                 this_color = color.blue
-            c = curve(color=this_color, radius=0.2)
+            c = curve(color=this_color, radius=0.1)
             if chain:
                 point2 = chain.get_list()[0].copy()
             else:
@@ -174,7 +175,7 @@ class pyRoom(Room):
                 if (self.if_out_of_range(point2, point)):
                     pass
                 else:
-                    c = curve(color=this_color, radius=0.2)
+                    c = curve(color=this_color, radius=0.1)
                 c.append(vector(point[0], point[1], point[2]))
                 point2 = point.copy()
         return scene
@@ -395,7 +396,7 @@ def Inclusion_Complex(parameter):
     if not os.path.exists('Complex'):
         os.mkdir('Complex')
 
-    r = pyRoom(24, 24, 96, Ep=[[0, 0, 0], [0, 0.5, 2], [0, 2, 0.5]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0.2]])
+    r = pyRoom(32, 32, 32, Ep=[[0, 0, 0], [0, 0, 2], [0, 2, 0]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     r.py_inputECC_with_small()
 
     r.movie(200000, 1, 15)
