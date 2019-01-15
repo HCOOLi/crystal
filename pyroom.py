@@ -168,10 +168,11 @@ class pyRoom(Room):
                 this_color = color.blue
             c = curve(color=this_color, radius=0.1)
             if chain:
-                point2 = chain.get_list()[0].copy()
+                point2 = chain.get_list()["chain"][0].copy()['position']
             else:
                 continue
-            for point in chain.get_list():
+            for point in chain.get_list()["chain"]:
+                point = point['position']
                 if (self.if_out_of_range(point2, point)):
                     pass
                 else:
@@ -401,10 +402,11 @@ def Inclusion_Complex(parameter):
 
     r.movie(200000, 1, 15)
     r.draw(title="chain-%3.2f.json" % (T))
+    r.save("Complex/chain-%3.2raw.json" % (T))
     ###########################
     r.movie(200000, 1, T)
     r.draw(title="chain-%3.2f.json" % (T))
-    # r.save("Complex/chain-%3.2f.json" % (T))
+    r.save("Complex/chain-%3.2f.json" % (T))
 
     end = time.time()
     print('Task%f runs %0.2f seconds.' % (T, (end - start)))

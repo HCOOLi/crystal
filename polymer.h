@@ -61,12 +61,15 @@ public:
 	shared_ptr< Point>&operator[](int i) { return chain[i]; }
 	shared_ptr< Point> operator[](int i) const { return chain[i]; }
 	void construct();
-	py::list get_list()const {
-		py::list a;
+	py::dict get_list()const {
+		py::dict json;
+		py::list chain_list;
 		for (int i = 0; i < length; i++) {
-			a.append(chain[i]->get_list());
+			chain_list.append(chain[i]->get_list());
 		}
-		return a;
+		json["chain"] = chain_list;
+		json["type"] = this->type;
+		return json;
 	}
 	Point &  get_polymer(int i) {
 		return *chain[i];
@@ -133,9 +136,12 @@ public:
 	Room(int x, int y, int z, py::list Ep, py::list Eb ) : lattice(x, y, z), shape(vec{ x,y,z }) {
 		cout << "constructing"<<endl;
 		Ep_matrix.resize(py::len(Ep));
+		//cout << py::len(Ep);
 		for (int i = 0; i < py::len(Ep); i++) {
-			
+			Ep[i];
+			cout << 'a';
 			py::list Ep_array = py::extract<py::list>(Ep[i]);
+			cout << py::len(Ep_array);
 			Ep_matrix[i].resize(py::len(Ep_array));
 			for (int j = 0; j < py::len(Ep_array); j++) {
 				Ep_matrix[i][j] = py::extract<double>(Ep_array[j]);
@@ -188,16 +194,16 @@ public:
 	//}
 	void initmoves();
 
-	shared_ptr<Point> set_point(vec location, int chain_num, int pos_in_chain, int type, int movable);
+	shared_ptr<Point> set_point(vec location, int chain_num, int pos_in_chain, int type, int moveable);
 
 	//some useful functions
 	bool intersect(vec &point1, vec &point2)const;
 	int get_side_num(vec & p1, vec & p2) const;
 	vec cal_direction(const vec & point1, const vec & point2) const;
 
-	void input_one_ECC(vec init, int length, int direction, int type, int movable);
+	void input_one_ECC(vec init, int length, int direction, int type, int moveable);
 
-	void py_input_one_ECC(int x, int y, int z, int length, int direction, int type, int movable);
+	void py_input_one_ECC(int x, int y, int z, int length, int direction, int type, int moveable);
 
 
 
@@ -211,7 +217,7 @@ public:
 	void inputcircle(int num, int length);
 	void input_stop_chain();
 	void input_stop_chain2();
-	void input_one_circle(vec init, int length, int direction, int movable);
+	void input_one_circle(vec init, int length, int direction, int moveable);
 	void construct_by_pylist(py::list chain_list);
 
 	//move

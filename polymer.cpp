@@ -39,7 +39,7 @@ inline vec Room::cal_direction(const vec & point1, const vec & point2)const
 
 }
 
-void Room::input_one_ECC(vec init, int length, int direction,int type,int movable)
+void Room::input_one_ECC(vec init, int length, int direction,int type,int moveable)
 {
 	try {
 		Polymer p;
@@ -50,7 +50,7 @@ void Room::input_one_ECC(vec init, int length, int direction,int type,int movabl
 		for (int j = 0; j < length; j++) {
 			vec point(init);
 			point[direction] += j;
-			p[j] = set_point(point, chain_num, j, type,movable);
+			p[j] = set_point(point, chain_num, j, type,moveable);
 		}
 		p.construct();
 		polymer_list.emplace_back(move(p));
@@ -63,31 +63,38 @@ void Room::input_one_ECC(vec init, int length, int direction,int type,int movabl
 	
 }
 
-void Room::py_input_one_ECC(int x,int y,int z, int length, int direction,int type, int movable)
+void Room::py_input_one_ECC(int x,int y,int z, int length, int direction,int type, int moveable)
 {
-	input_one_ECC(vec{ x,y,z }, length, direction,type, movable);
+	input_one_ECC(vec{ x,y,z }, length, direction,type, moveable);
 }
 
-void Room::input_one_circle(vec init, int length, int direction, int movable) {
+void Room::input_one_circle(vec init, int length, int direction, int moveable) {
 
 }
 void Room::construct_by_pylist(py::list chain_list) {
+	
 	polymer_list.clear();
 	lattice = Grid(shape[0], shape[1], shape[2]);
 	for (int i = 0; i < py::len(chain_list); i++) {
-		py::list chain = py::extract<py::list>(chain_list[i]);
+		py::dict chain_dict = py::extract<py::dict>(chain_list[i]);
+		py::list chain = py::extract<py::list>(chain_dict["chain"]);
+		int type = py::extract<int>(chain_dict["type"]);
 		Polymer p;
 		p.chain.resize(py::len(chain));
 		p.length = py::len(chain);
+		p.type = type;
 		int chain_num = polymer_list.size();
 		for (int j = 0; j < py::len(chain); j++) {
-			py::list point_in_list = py::extract<py::list>(chain[j]);
+			py::dict point_in_list = py::extract<py::dict>(chain[j]);
+			py::list position= py::extract<py::list>(point_in_list["position"]);
+			//{}
 			vec point;
-			for (int k = 0; k < py::len(point_in_list); k++) {
-				int x = py::extract<int>(point_in_list[k]);
+			for (int k = 0; k < py::len(position); k++) {
+				int x = py::extract<int>(position[k]);
 				point[k] = x;
 			}
-			p[j] = set_point(point, chain_num, j,1, 0);
+			int type = py::extract<int>(point_in_list["type"]);
+			p[j] = set_point(point, chain_num, j,type, 0);
 
 
 		}
@@ -153,14 +160,14 @@ void Room::input_stop_chain2() {
 }
 
 
-inline shared_ptr< Point> Room::set_point(vec location,int chain_num, int pos_in_chain, int type,int movable)
+inline shared_ptr< Point> Room::set_point(vec location,int chain_num, int pos_in_chain, int type,int moveable)
 {
 	try {
 		if (lattice[location]) {
 			cout << location;
 			throw string("error");
 		}
-		shared_ptr< Point> temp (new Point(location, chain_num, pos_in_chain, type, movable));
+		shared_ptr< Point> temp (new Point(location, chain_num, pos_in_chain, type, moveable));
 		lattice[location] = temp;
 		return temp;
 	}
@@ -229,7 +236,7 @@ bool Room::canMove(vec & point, vec & direction)const
 {
 	try {
 		shared_ptr< Point>p = lattice[point];
-		if (p->movable == 1) {
+		if (p->moveable == 1) {
 			return false;
 		}
 		vec p_next = (point + direction) % shape;
@@ -260,7 +267,7 @@ void Room::localSnakeMove(int i, stack<vec> &path)
 {
 	int length = polymer_list[i].length;
 	if (length == 0)return;
-	if (polymer_list[i][0]->movable == 1) return;
+	if (polymer_list[i][0]->moveable == 1) return;
 	int start_point = rand() % length;
 	shared_ptr<Point> pol_iter= polymer_list[i][start_point];
 	vec p1, p2;

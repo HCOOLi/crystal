@@ -11,7 +11,7 @@ class Room():
     def inputECC(self, num, length):
         pass
 
-    def input_one_ECC(self, x, y, z, length, direction, movable):
+    def input_one_ECC(self, x, y, z, length, direction, ty, movable):
         pass
 
     def get_result(self):
