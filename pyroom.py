@@ -278,10 +278,10 @@ def reconstruct(parameter):
 
     try:
         print('Run task steps=%d Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (steps, Ep, Eb, T, length, os.getpid()))
-        r = pyRoom(32, 32, length, Ep=Ep, Eb=Eb)
+        r = pyRoom(24, 24, 24, Ep=[[0, 0, 0], [0, 0.5, 2], [0, 2, 0.5]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
         r.construct_by_pylist(r.load_polymer(filepath=loadpath))
         # r.draw(path=loadpath)
-        r.draw()
+        r.draw(title=loadpath)
         print(r.py_cal_thickness())
 
         # r.cal_crystal()
@@ -397,15 +397,15 @@ def Inclusion_Complex(parameter):
     if not os.path.exists('Complex'):
         os.mkdir('Complex')
 
-    r = pyRoom(32, 32, 32, Ep=[[0, 0, 0], [0, 0, 2], [0, 2, 0]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    r = pyRoom(24, 24, 24, Ep=[[0, 0, 0], [0, 0.5, 2], [0, 2, 0.5]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     r.py_inputECC_with_small()
 
     r.movie(200000, 1, 15)
-    r.draw(title="chain-%3.2f.json" % (T))
-    r.save("Complex/chain-%3.2raw.json" % (T))
+    # r.draw(title="chain-%3.2f.json" % (T))
+    # r.save("Complex/chain-%3.2raw.json" % (T))
     ###########################
-    r.movie(200000, 1, T)
-    r.draw(title="chain-%3.2f.json" % (T))
+    r.movie(500000, 1, T)
+    # r.draw(title="chain-%3.2f.json" % (T))
     r.save("Complex/chain-%3.2f.json" % (T))
 
     end = time.time()
