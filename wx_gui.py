@@ -1,13 +1,13 @@
-#!/usr/bin/env python
+
 # -*- coding: utf-8 -*-
 
 '''
     Function:绘图
     Input：NONE
     Output: NONE
-    author: socrates
-    blog:http://www.cnblogs.com/dyx1024/
-    date:2012-07-14
+    author:
+    blog:
+    date:
 '''
 
 import wx
@@ -16,6 +16,19 @@ import os
 from pyroom import *
 
 
+class Showing(wx.Frame):
+
+    def __init__(self, parent):
+        self.title = "Show"
+        wx.Frame.__init__(self, parent, 1, self.title, size=(400, 400))
+        self.panel = wx.Panel(self, -1)
+        self.open_button = wx.wxEVT_BUTTON
+        self.button = wx.Button(self.panel, -1, "Hello", pos=(50, 20))
+        self.Bind(wx.EVT_BUTTON, self.OnClick, self.button)
+        self.button.SetDefault()
+
+    def OnClick(self, event):
+        self.button.SetLabel("Clicked")
 #
 # class PaintWindow(wx.Window):
 #     def __init__(self, parent, id):

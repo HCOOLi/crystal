@@ -12,9 +12,9 @@ if __name__ == '__main__':
     parameter_list = []
 
     for Ep in [1.0]:
-        for Eb in [0.15]:
+        for Eb in np.arange(0, 3, 0.2):
             for length in [128]:
-                for T in np.arange(1.0, 3.5, 0.5):
+                for T in [2.5]:
                     for T_anneal in [0]:
                         for steps in [50000]:
                             # step_heating({"Eb": Eb, "Ep": Ep, "length": length, "T": T, "T_anneal": T_anneal, "steps": steps})
@@ -24,8 +24,8 @@ if __name__ == '__main__':
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
         with Pool(10) as p:
-            # p.map_async(Inclusion_Complex, parameter_list)
-            p.map_async(reconstruct, parameter_list)
+            p.map_async(Inclusion_Complex, parameter_list)
+            # p.map_async(reconstruct, parameter_list)
             # p.map_async(step_heating, parameter_list)
             # p.map_async(anneal, parameter_list)
             p.close()

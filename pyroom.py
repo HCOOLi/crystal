@@ -110,9 +110,10 @@ class pyRoom(Room):
 
     def save(self, file_path):
         parameters = {"Ep": self.Ep, "Eb": self.Eb}
+        saving_dict = {"parameters": parameters, "data": self.get_list()}
         with open(file_path, 'w') as file:
-            file.write(json.dumps(self.get_list()))
-
+            # file.write(json.dumps(self.get_list()))
+            file.write(json.dumps(saving_dict))
     def py_input_stop_chain(self):
         for i in range(self.shape[0] - 1):
             for j in range(2):
@@ -278,7 +279,7 @@ def reconstruct(parameter):
 
     try:
         print('Run task steps=%d Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (steps, Ep, Eb, T, length, os.getpid()))
-        r = pyRoom(24, 24, 24, Ep=[[0, 0, 0], [0, 0.5, 2], [0, 2, 0.5]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+        r = pyRoom(32, 32, 128, Ep=[[0, 0, 0], [0, 1, 2], [0, 2, 1]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
         r.construct_by_pylist(r.load_polymer(filepath=loadpath))
         # r.draw(path=loadpath)
         r.draw(title=loadpath)
@@ -397,7 +398,7 @@ def Inclusion_Complex(parameter):
     if not os.path.exists('Complex'):
         os.mkdir('Complex')
 
-    r = pyRoom(24, 24, 24, Ep=[[0, 0, 0], [0, 0.5, 2], [0, 2, 0.5]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    r = pyRoom(24, 24, 24, Ep=[[0, 0, 0], [0, 1, Ep], [0, Ep, 1]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     r.py_inputECC_with_small()
 
     r.movie(200000, 1, 15)
@@ -406,7 +407,7 @@ def Inclusion_Complex(parameter):
     ###########################
     r.movie(500000, 1, T)
     # r.draw(title="chain-%3.2f.json" % (T))
-    r.save("Complex/chain-%3.2f.json" % (T))
+    r.save("Complex/chainEb-1,1,%3.2f.json" % (Eb))
 
     end = time.time()
     print('Task%f runs %0.2f seconds.' % (T, (end - start)))
