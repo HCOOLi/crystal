@@ -82,7 +82,8 @@ class pyRoom(Room):
                         num += 1
                 else:
                     # self.py_input_one_ECC([i, j, int(self.shape[2] / 8)], int(3 * self.shape[2] / 4), 2, 1, 0)
-                    self.py_input_one_ECC([i, j, 1], int(self.shape[2] - 2), 2, 1, 0)
+                    # self.py_input_one_ECC([i, j, 1], int(self.shape[2] - 2), 2, 1, 0)
+                    self.py_input_one_ECC([i, j, 1], int(self.shape[2] / 2), 2, 1, 0)
                     num += 1
 
                 pass
@@ -188,7 +189,10 @@ class pyRoom(Room):
         with open(filepath, 'r') as file:
             all_line_txt = file.readline()  # 读所有行
             polymerlist = json.loads(all_line_txt)
-            return polymerlist
+            try:
+                return polymerlist['data']
+            except:
+                return polymerlist
 
     def step_heating(self, start, end, step, EC_max):
         E_list, Ec_list, Ep_list, t_list = [], [], [], []
@@ -390,24 +394,24 @@ def washing_small_a_b(parameter):
 
 
 def Inclusion_Complex(parameter):
-    Ep, Eb, T, length = parameter["Ep"], parameter["Eb"], parameter["T"], parameter["length"]
+    Ep1, Ep12, Eb, T, length = parameter["Ep1"], parameter["Ep12"], parameter["Eb"], parameter["T"], parameter["length"]
 
     # try:
-    print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep, Eb, T, length, os.getpid()))
+    print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep1, Eb, T, length, os.getpid()))
     start = time.time()
     if not os.path.exists('Complex'):
         os.mkdir('Complex')
 
-    r = pyRoom(24, 24, 24, Ep=[[0, 0, 0], [0, 1, Ep], [0, Ep, 1]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    r = pyRoom(24, 24, 24, Ep=[[0, 0, 0], [0, 0, Ep12], [0, Ep12, Ep1]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     r.py_inputECC_with_small()
 
-    r.movie(200000, 1, 15)
+    r.movie(200000, 1, 100)
     # r.draw(title="chain-%3.2f.json" % (T))
     # r.save("Complex/chain-%3.2raw.json" % (T))
     ###########################
-    r.movie(500000, 1, T)
+    r.movie(2000000, 1, T)
     # r.draw(title="chain-%3.2f.json" % (T))
-    r.save("Complex/chainEb-1,1,%3.2f.json" % (Eb))
+    r.save("Complex/length/chainEp-0,%3.2f,%3.2f,T=%3.2f.json" % (Ep1, Ep12, T))
 
     end = time.time()
     print('Task%f runs %0.2f seconds.' % (T, (end - start)))

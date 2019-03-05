@@ -63,6 +63,30 @@ void Room::input_one_ECC(vec init, int length, int direction,int type,int moveab
 	
 }
 
+void Room::input_one_FCC(vec init, int length, int direction, int fold_direction, int type, int moveable)
+{
+	try {
+		Polymer p;
+		p.chain.resize(length);
+		p.length = length;
+		p.type = type;
+		int chain_num = polymer_list.size();
+		for (int j = 0; j < length; j++) {
+			vec point(init);
+			point[direction] += j%shape[direction];
+			point[fold_direction] += int(j/ shape[direction]);
+
+			p[j] = set_point(point, chain_num, j, type, moveable);
+		}
+		p.construct();
+		polymer_list.emplace_back(move(p));
+	}
+	catch (...) {
+		cout << __FUNCTION__ << endl;
+		throw;
+	}
+}
+
 void Room::py_input_one_ECC(int x,int y,int z, int length, int direction,int type, int moveable)
 {
 	input_one_ECC(vec{ x,y,z }, length, direction,type, moveable);

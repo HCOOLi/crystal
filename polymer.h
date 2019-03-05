@@ -202,6 +202,7 @@ public:
 	vec cal_direction(const vec & point1, const vec & point2) const;
 
 	void input_one_ECC(vec init, int length, int direction, int type, int moveable);
+	void input_one_FCC(vec init, int length, int direction,int fold_direction, int type, int moveable);
 
 	void py_input_one_ECC(int x, int y, int z, int length, int direction, int type, int moveable);
 
