@@ -7,7 +7,7 @@ import numpy as np
 
 
 def parameter_generator():
-    for Ep1 in np.arange(3, 5, 0.5):
+    for Ep1 in np.arange(0, 1, 0.5):
         for Ep12 in np.arange(3, 8, 0.5):
             for Eb in [1.0]:
                 for length in [128]:
