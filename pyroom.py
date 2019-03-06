@@ -402,7 +402,7 @@ def Inclusion_Complex(parameter):
     if not os.path.exists('Complex'):
         os.mkdir('Complex')
 
-    r = pyRoom(32, 32, 32, Ep=[[0, 0, 0], [0, 1, Ep], [0, Ep, 1]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    r = pyRoom(24, 24, 24, Ep=[[0, 0, 0], [0, 0, Ep12], [0, Ep12, Ep1]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     r.py_inputECC_with_small()
 
     r.movie(200000, 1, 100)
