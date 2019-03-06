@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
-        with Pool(9) as p:
+        with Pool(24) as p:
             p.map_async(Inclusion_Complex, parameter_list)
             # p.map_async(reconstruct, parameter_list)
             # p.map_async(step_heating, parameter_list)
