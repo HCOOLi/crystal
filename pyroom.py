@@ -166,6 +166,7 @@ class pyRoom(Room):
             if chaintype == 1:
                 this_color = color.yellow
             else:
+                # return
                 this_color = color.blue
             c = curve(color=this_color, radius=0.1)
             if chain:
@@ -315,7 +316,6 @@ def anneal(parameter):
         r.save(savepath)
         # r.draw(path="chain%d/chain-%d,%d,%d,%d.json" % (length, Ep * 10, Eb * 10, T * 10, k))
         # r.cal_crystal()
-
     except Exception as e:
         print(e)
         print("subprocess wrong")
