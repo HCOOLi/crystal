@@ -82,8 +82,8 @@ class pyRoom(Room):
                         num += 1
                 else:
                     # self.py_input_one_ECC([i, j, int(self.shape[2] / 8)], int(3 * self.shape[2] / 4), 2, 1, 0)
-                    # self.py_input_one_ECC([i, j, 1], int(self.shape[2] - 2), 2, 1, 0)
-                    self.py_input_one_ECC([i, j, 1], int(self.shape[2] / 2), 2, 1, 0)
+                    self.py_input_one_ECC([i, j, 1], int(self.shape[2] - 2), 2, 1, 0)
+                    # self.py_input_one_ECC([i, j, 1], int(self.shape[2] / 2), 2, 1, 0)
                     num += 1
 
                 pass
@@ -402,14 +402,14 @@ def Inclusion_Complex(parameter):
     if not os.path.exists('Complex'):
         os.mkdir('Complex')
 
-    r = pyRoom(24, 24, 24, Ep=[[0, 0, 0], [0, 0, Ep12], [0, Ep12, Ep1]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    r = pyRoom(32, 32, 32, Ep=[[0, 0, 0], [0, 0, Ep12], [0, Ep12, Ep1]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     r.py_inputECC_with_small()
 
     r.movie(200000, 1, 100)
     # r.draw(title="chain-%3.2f.json" % (T))
     # r.save("Complex/chain-%3.2raw.json" % (T))
     ###########################
-    r.movie(2000000, 1, T)
+    r.movie(1000000, 1, T)
     # r.draw(title="chain-%3.2f.json" % (T))
     r.save("Complex/chainEp-0,%3.2f,%3.2f,T=%3.2f.json" % (Ep1, Ep12, T))
 
