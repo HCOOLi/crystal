@@ -72,7 +72,7 @@ class pyRoom(Room):
 
         for i in range(self.shape[0]):
             for j in range(self.shape[1]):
-                if j % 2 == 0 or i % 2 == 0:
+                if j % 2 == 0 or i % 2 == 0 or (i + j) % 4 == 0:
                     for k in range(0, int(3 * self.shape[2] / 4), 2):
                         self.a_layer[i].append(num)
                         self.b_layer[j].append(num)
