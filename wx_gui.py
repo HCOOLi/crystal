@@ -1,15 +1,6 @@
 
 # -*- coding: utf-8 -*-
 
-'''
-    Function:绘图
-    Input：NONE
-    Output: NONE
-    author:
-    blog:
-    date:
-'''
-
 import wx
 import pickle
 import os

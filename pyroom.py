@@ -395,14 +395,15 @@ def washing_small_a_b(parameter):
 
 def Inclusion_Complex(parameter):
     Ep1, Ep12, Eb, T, length = parameter["Ep1"], parameter["Ep12"], parameter["Eb"], parameter["T"], parameter["length"]
-
+    Eb12 = Ep12
+    Ep12 = 0
     # try:
     print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep1, Eb, T, length, os.getpid()))
     start = time.time()
     if not os.path.exists('Complex'):
         os.mkdir('Complex')
-
-    r = pyRoom(32, 32, 32, Ep=[[0, 0, 0], [0, 0, Ep12], [0, Ep12, Ep1]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+    r = pyRoom(32, 32, 32, Ep=[[0, 0, 0], [0, 0, 0], [0, 0, Ep1]], Eb=[[0, 0, 0], [0, 0, Eb12], [0, Eb12, 0]])
+    # r = pyRoom(32, 32, 32, Ep=[[0, 0, 0], [0, 0, Ep12], [0, Ep12, Ep1]], Eb=[[0, 0, Eb12], [0, 0, 0], [0, Eb12, 0]])
     r.py_inputECC_with_small()
 
     r.movie(200000, 1, 100)
@@ -411,7 +412,8 @@ def Inclusion_Complex(parameter):
     ###########################
     r.movie(1000000, 1, T)
     # r.draw(title="chain-%3.2f.json" % (T))
-    r.save("Complex/chainEp-0,%3.2f,%3.2f,T=%3.2f.json" % (Ep1, Ep12, T))
+    # r.save("Complex/chainEp-0,%3.2f,%3.2f,T=%3.2f.json" % (Ep1, Ep12, T))
+    r.save("Complex/chainEp-0,%3.2f,%3.2f,Eb=0,0,%3.2f,T=%3.2f.json" % (Ep1, Ep12, Eb12, T))
 
     end = time.time()
     print('Task%f runs %0.2f seconds.' % (T, (end - start)))

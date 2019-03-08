@@ -4,11 +4,37 @@ from concurrent.futures import ProcessPoolExecutor
 from multiprocessing import Pool
 import os
 import numpy as np
+from typing import List, Dict
+from copy import deepcopy
+
+
+# def mul(lista:List[Dict],listb:List[Dict],kb):
+#     muled=[]
+#     for a in lista:
+#         for b in listb:
+#             ac=deepcopy(a)
+#             ac[kb] = b
+#             muled.append(ac)
+#     return muled
+
+
 
 
 def parameter_generator():
+    # para_list={}
+    # aparted={}
+    # para_list["Ep1"]=list(np.arange(0, 1.6, 0.5))
+    # para_list["Ep12"]=list(np.arange(4, 8, 0.5))
+    # para_list["Eb"]=[1.0]
+    # para_list["T"]=[3.5]
+    # para_list["steps"]=[50000]
+    # para_list["length"]=[128]
+
+
+
+
     for Ep1 in np.arange(0, 1.6, 0.5):
-        for Ep12 in np.arange(4, 8, 0.5):
+        for Ep12 in np.arange(0, 8, 0.5):
             for Eb in [1.0]:
                 for length in [128]:
                     for T in [3.5]:
