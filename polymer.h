@@ -7,7 +7,7 @@
 #include<stack>
 #include"myerror.h"
 #include<boost/python.hpp>
-
+using namespace std;
 
 namespace py = boost::python;
 
@@ -53,9 +53,9 @@ public:
 	};
 
 	Polymer(int l) : length(l) {}
-	int get_type() {
-		return type;
-	}
+	//int get_type() {
+	//	//return type;
+	//}
 
 
 	shared_ptr< Point>&operator[](int i) { return chain[i]; }
@@ -123,9 +123,9 @@ public:
 	const double Ec0=1.0;
 	vector<vector<double> > Eb_matrix;
 	vector<vector<double> > Ep_matrix;
-	//const double b2a;
-	//const double b2b;
-	//const double b2c;
+	const double b2a=0.5;
+	const double b2b=0.5;
+	const double b2c=0.5;
 
 	vector<Polymer> polymer_list;
 
@@ -134,22 +134,28 @@ public:
 		return polymer_list[i];
 	}
 	Room(int x, int y, int z, py::list Ep, py::list Eb ) : lattice(x, y, z), shape(vec{ x,y,z }) {
-		cout << "constructing"<<endl;
 		Ep_matrix.resize(py::len(Ep));
-		//cout << py::len(Ep);
+		cout << py::len(Ep);
 		for (int i = 0; i < py::len(Ep); i++) {
-			Ep[i];
-			cout << 'a';
 			py::list Ep_array = py::extract<py::list>(Ep[i]);
-			cout << py::len(Ep_array);
 			Ep_matrix[i].resize(py::len(Ep_array));
 			for (int j = 0; j < py::len(Ep_array); j++) {
-				Ep_matrix[i][j] = py::extract<double>(Ep_array[j]);
+				try{
+					Ep_matrix[i][j] = py::extract<double>(Ep_array[j]); 
+				}
+				catch(exception& e){
+					cout << e.what();
+					cout << "int";
+					Ep_matrix[i][j] = py::extract<int>(Ep_array[j]);
+				}
+
+				//cout << i << "," << j<<endl;
 			}
 		}
 		cout << "Ep_matrix"<<endl;
 		Eb_matrix.resize(py::len(Eb));
 		for (int i = 0; i < py::len(Eb); i++) {
+			cout << 'b';
 
 			py::list Eb_array = py::extract<py::list>(Eb[i]);
 			Eb_matrix[i].resize(py::len(Eb_array));
@@ -201,10 +207,11 @@ public:
 	int get_side_num(vec & p1, vec & p2) const;
 	vec cal_direction(const vec & point1, const vec & point2) const;
 
-	void input_one_ECC(vec init, int length, int direction, int type, int moveable);
+	void input_one_ECC(vec init, int length, int direction, py::list type, int moveable);
 	void input_one_FCC(vec init, int length, int direction,int fold_direction, int type, int moveable);
 
-	void py_input_one_ECC(int x, int y, int z, int length, int direction, int type, int moveable);
+	void py_input_one_ECC(int x, int y, int z, int length, int direction, py::list type, int moveable);//transmit
+
 
 
 

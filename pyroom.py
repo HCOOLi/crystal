@@ -6,6 +6,7 @@ import os
 import time
 import numpy as np
 from crystal import Room
+from typing import Dict, List, Tuple
 
 
 class pyRoom(Room):
@@ -17,7 +18,7 @@ class pyRoom(Room):
 
     def py_input_one_ECC(self, a, length, direction, ty, movable):
         # int x,int y,int z, int length, int direction, int type
-        self.input_one_ECC(int(a[0]), int(a[1]), int(a[2]), int(length), int(direction), int(ty), int(movable))
+        self.input_one_ECC(int(a[0]), int(a[1]), int(a[2]), int(length), int(direction), ty, int(movable))
 
 
     def py_inputECC_with_small(self):
@@ -38,7 +39,7 @@ class pyRoom(Room):
 
         for i in range(self.shape[0]):
             for j in range(self.shape[1]):
-                if j % 2 == 0 or i % 2 == 0 or (i + j) % 4 == 0:
+                if j % 2 == 0 or i % 2 == 0:
                     for k in range(0, int(3 * self.shape[2] / 4), 2):
                         self.a_layer[i].append(num)
                         self.b_layer[j].append(num)
@@ -48,8 +49,8 @@ class pyRoom(Room):
                         num += 1
                 else:
                     # self.py_input_one_ECC([i, j, int(self.shape[2] / 8)], int(3 * self.shape[2] / 4), 2, 1, 0)
-                    self.py_input_one_ECC([i, j, 1], int(self.shape[2] - 2), 2, 1, 0)
-                    # self.py_input_one_ECC([i, j, 1], int(self.shape[2] / 2), 2, 1, 0)
+                    # self.py_input_one_ECC([i, j, 1], int(self.shape[2] - 2), 2, 1, 0)
+                    self.py_input_one_ECC([i, j, 1], int(self.shape[2] / 2), 2, 1, 0)
                     num += 1
 
                 pass
@@ -117,27 +118,43 @@ class pyRoom(Room):
         nums = self.get_num_of_polymers()
         for i in range(nums):
             chain = self.get_polymer(i)
-            chaintype = chain.get_type()
+
             # print(chaintype)
 
             # for chain in polylist:
-            if chaintype == 1:
-                this_color = color.yellow
-            else:
-                # return
-                this_color = color.blue
-            c = curve(color=this_color, radius=0.1)
+
+            c = curve(color=color.yellow, radius=0.1)
             if chain:
                 point2 = chain.get_list()["chain"][0].copy()['position']
+                type = chain.get_list()["chain"][0].copy()["type"]
+                if type == 1:
+                    this_color = color.yellow
+                elif type == 2:
+                    continue
+                    this_color = color.blue
+                elif type == 3:
+                    continue
+                    this_color = color.red
             else:
                 continue
-            for point in chain.get_list()["chain"]:
-                point = point['position']
+            for pointinfo in chain.get_list()["chain"]:
+                point = pointinfo['position']
+                type = pointinfo["type"]
+                if type == 1:
+                    this_color = color.yellow
+                elif type == 2:
+                    continue
+                    this_color = color.blue
+                elif type == 3:
+                    continue
+                    this_color = color.red
                 if (self.if_out_of_range(point2, point)):
                     pass
                 else:
-                    c = curve(color=this_color, radius=0.1)
+                    c = curve(color=color.yellow, radius=0.1)
+
                 c.append(vector(point[0], point[1], point[2]))
+                sphere(pos=vector(point[0], point[1], point[2]), color=this_color, radius=0.2)
                 point2 = point.copy()
         return scene
 

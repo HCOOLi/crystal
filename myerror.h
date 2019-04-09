@@ -3,11 +3,12 @@
 #include"vec.h"
 #include<string>
 // error types //To be done
-class WrongPoint{ 
+class WrongPoint:exception{ 
 public: 
 	WrongPoint(string a,vec b) {
-		std::cout << a;
-		std::cout << b;
+		std::cerr << this->what();
+		std::cerr << a;
+		std::cerr << b;
 	}
 };
 

@@ -11,7 +11,6 @@ BOOST_PYTHON_MODULE(crystal)
 	py::class_<Point>("Point");
 
 	py::class_<Polymer>("Polymer")
-		.def("get_type", &Polymer::get_type)
 		.def("get_list", &Polymer::get_list)
 		;
 	py::class_<Room>("Room", py::init<int, int, int, py::list, py::list >())
