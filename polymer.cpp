@@ -38,6 +38,7 @@ inline vec Room::cal_direction(const vec & point1, const vec & point2)const
 	return temp;
 
 }
+
 void Room::input_one_ECC(vec init, int length, int direction, py::list type_list, int moveable)
 {
 	try {
@@ -64,16 +65,23 @@ void Room::input_one_ECC(vec init, int length, int direction, py::list type_list
 	
 }
 
-void Room::input_one_FCC(vec init, int length, int direction, int fold_direction, int type, int moveable)
+void Room::input_one_FCC(vec init, int length, int direction, int fold_direction, py::list  type_list, int moveable)
 {
 	try {
 		Polymer p;
 		p.chain.resize(length);
 		p.length = length;
+		p.type = py::extract<int>(type_list[0]);
 		int chain_num = polymer_list.size();
 		for (int j = 0; j < length; j++) {
+			int type = py::extract<int>(type_list[j]);
 			vec point(init);
-			point[direction] += j%shape[direction];
+			if ((j / shape[direction]) % 2 == 0) {
+			point[direction] += j % shape[direction];
+			}
+			else {
+				point[direction] += shape[direction]-j % shape[direction]-1;
+			}
 			point[fold_direction] += int(j/ shape[direction]);
 
 			p[j] = set_point(point, chain_num, j, type, moveable);
@@ -90,6 +98,11 @@ void Room::input_one_FCC(vec init, int length, int direction, int fold_direction
 void Room::py_input_one_ECC(int x,int y,int z, int length, int direction,py::list type, int moveable)
 {
 	input_one_ECC(vec{ x,y,z }, length, direction,type, moveable);
+}
+
+void Room::py_input_one_FCC(int x, int y, int z, int length, int direction, int fold_direction, py::list type, int moveable)
+{
+	input_one_FCC(vec{ x,y,z }, length, direction,fold_direction, type, moveable);
 }
 
 void Room::input_one_circle(vec init, int length, int direction, int moveable) {

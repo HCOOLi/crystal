@@ -21,24 +21,6 @@ class Simulator():
     def parameters(self):
         pass
 
-    def run(self):
-        start = time.time()
-        print('Parent process %s.' % os.getpid())
-        parameter_list = list(self.parameters())
-        try:
-            # with ProcessPoolExecutor(max_workers=5) as p:
-            with Pool(24) as p:
-                p.map_async(self.simulate, parameter_list)
-                p.close()
-                p.join()
-        except:
-            print("shutdown")
-            p.terminate()
-            # p.shutdown(wait=False)
-
-        print('All subprocesses done.')
-        end = time.time()
-        print('Tasks runs %0.2f seconds.' % (end - start))
 
 
 def reconstruct(parameter):
@@ -231,47 +213,46 @@ class SecondNuclear(Simulator):
 
     def parameters(self):
         import itertools
-        Ep = list(np.arange(0, 1.6, 0.5))
+        Ep = list(np.arange(0.5, 1.6, 0.6))
 
         length = [128]
-        T = [3.5]
+        T = list(np.arange(4, 6, 0.2))
         return itertools.product(Ep, length, T)
 
     @staticmethod
     def install_model(r: pyRoom, num, length):
-        # vec
-        start_point = r.shape / 2
-        num = 31 * 31
-        length = 31
-        sqrt_num = math.ceil(math.sqrt(num))
-        start_point[1] -= length / 2
-        start_point[0] -= int(sqrt_num / 2)
-        start_point[2] -= int(sqrt_num / 2)
-        for i in range(0, sqrt_num):
-            for j in range(0, sqrt_num):
-                if i * sqrt_num + j < num:
-                    r.py_input_one_ECC([start_point[0] + i, start_point[1], start_point[2] + j], length, 1, 1, 0)
+        # for i in range(0, r.shape[1]):
+        r.py_input_one_FCC([0, 0, 0], length * length, 2, 1, [1] * length * length, 1)
 
-                else:
-                    return r
-        return r
+        # vec
+        for i in range(1, r.shape[0] - 1):
+            for j in range(0, r.shape[1] - 1, 4):
+                r.py_input_one_FCC([i, j, 0], length * 4, 2, 1, [1] * length * 4, 0)
+
 
     @staticmethod
     def simulate(parameter):
 
         try:
-            Ep, T, length = parameter[0], parameter[1], parameter[2]
+            Ep, length, T = parameter[0], parameter[1], parameter[2]
             print('Run task %f ,%f,%f(%s)...' % (Ep, 1, T, os.getpid()))
             start = time.time()
             EC_max = 31 * 31 * (31 - 1)
-
+            if not os.path.exists('Data'):
+                os.mkdir('Data')
             r = pyRoom(32, 32, 32, Ep=[[0, 0], [0, Ep]], Eb=[[0, 0], [0, 0]])
 
             SecondNuclear.install_model(r, 31 * 31, 31)
 
-            E_list, Ec_list, Ep_list, t_list, f = r.step_heating(6 * Ep, 1 * Ep, -0.1 * Ep, EC_max)
-
-
+            r.movie(1000000, 10000, 100)
+            # r.movie(2000000, 10000, T*Ep)
+            # E_list, Ec_list, Ep_list, t_list, f = r.step_heating(6 * Ep+0.1, 1 * Ep, -0.1 * Ep,10000,5000, EC_max)
+            r.save("Data/heated%3.2f-d.json" % (Ep))
+            # E_list, Ec_list, Ep_list, t_list, f = r.step_heating(6 * Ep+0.1, 1 * Ep, -0.1 * Ep+0.01,10000,5000, EC_max)
+            # plt.plot(t_list, f)
+            # plt.savefig("stepheating%3.2f.png" % (Ep))
+            r.movie(2000000, 10000, T * Ep)
+            r.save("Data/Ep=%3.2f,T=%3.2f.json" % (Ep, T * Ep))
         except Exception as e:
             print(e)
             raise e
@@ -283,4 +264,19 @@ if __name__ == '__main__':
     start = time.time()
     print('Parent process %s.' % os.getpid())
     S = SecondNuclear()
-    S.run()
+    parameter_list = list(S.parameters())
+    # S.simulate(parameter_list[1])
+    try:
+        # with ProcessPoolExecutor(max_workers=5) as p:
+        with Pool(10) as p:
+            p.map_async(S.simulate, parameter_list)
+            p.close()
+            p.join()
+    except:
+        print("shutdown")
+        p.terminate()
+        p.shutdown(wait=False)
+    #
+    # print('All subprocesses done.')
+    # end = time.time()
+    # print('Tasks runs %0.2f seconds.' % (end - start))

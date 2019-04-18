@@ -16,10 +16,15 @@ class pyRoom(Room):
         self.Ep = Ep
         self.Eb = Eb
 
-    def py_input_one_ECC(self, a, length, direction, ty, movable):
-        # int x,int y,int z, int length, int direction, int type
+    def py_input_one_ECC(self, a: List[int], length: int, direction: int, ty: List, movable: int) -> None:
+
         self.input_one_ECC(int(a[0]), int(a[1]), int(a[2]), int(length), int(direction), ty, int(movable))
 
+    def py_input_one_FCC(self, a: List[int], length: int, direction: int, fold_direction: int, ty: List,
+                         movable: int) -> None:
+
+        self.input_one_FCC(int(a[0]), int(a[1]), int(a[2]), int(length), int(direction),
+                           int(fold_direction), ty, int(movable))
 
     def py_inputECC_with_small(self):
 
@@ -64,6 +69,7 @@ class pyRoom(Room):
         return
         #   for i in self.c_layer[k]:
         #       self.delete_chain(i)
+
     def remove_a_layer(self, k):
         if k >= self.shape[0]:
             return
@@ -109,7 +115,7 @@ class pyRoom(Room):
         from vpython import canvas, vector, curve, color
         self.new_draw_box([0, 0, 0], self.shape)
 
-    def draw(self, polylist=None, title=None):
+    def draw_all(self, polylist=None, title=None):
         from vpython import canvas, vector, curve, color, sphere
 
         scene = canvas(title=title, width=800, height=800,
@@ -130,20 +136,22 @@ class pyRoom(Room):
                 if type == 1:
                     this_color = color.yellow
                 elif type == 2:
-                    continue
+                    # continue
                     this_color = color.blue
                 elif type == 3:
                     continue
                     this_color = color.red
+                c = curve(color=this_color, radius=0.1)
             else:
                 continue
+
             for pointinfo in chain.get_list()["chain"]:
                 point = pointinfo['position']
                 type = pointinfo["type"]
                 if type == 1:
                     this_color = color.yellow
                 elif type == 2:
-                    continue
+                    # continue
                     this_color = color.blue
                 elif type == 3:
                     continue
@@ -151,11 +159,64 @@ class pyRoom(Room):
                 if (self.if_out_of_range(point2, point)):
                     pass
                 else:
-                    c = curve(color=color.yellow, radius=0.1)
+                    c = curve(color=this_color, radius=0.1)
 
                 c.append(vector(point[0], point[1], point[2]))
-                sphere(pos=vector(point[0], point[1], point[2]), color=this_color, radius=0.2)
+                # sphere(pos=vector(point[0], point[1], point[2]), color=this_color, radius=0.2)
                 point2 = point.copy()
+        return scene
+
+    def draw_a_layer(self, layer, polylist=None, title=None):
+        from vpython import canvas, vector, curve, color, sphere
+
+        scene = canvas(title=title, width=800, height=800,
+                       center=vector(self.shape[0] / 2, self.shape[1] / 2, self.shape[2] / 2), background=color.white)
+        self.draw_box()
+        nums = self.get_num_of_polymers()
+        for i in range(nums):
+            chain = self.get_polymer(i)
+
+            c = curve(color=color.yellow, radius=0.1)
+            if chain:
+                point2 = chain.get_list()["chain"][0].copy()['position']
+
+                type = chain.get_list()["chain"][0].copy()["type"]
+                if type == 1:
+                    this_color = color.yellow
+                elif type == 2:
+                    # continue
+                    this_color = color.blue
+                elif type == 3:
+                    continue
+                    this_color = color.red
+
+                c = curve(color=this_color, radius=0.1)
+            else:
+                continue
+
+            for pointinfo in chain.get_list()["chain"]:
+                point = pointinfo['position']
+                type = pointinfo["type"]
+                if type == 1:
+                    this_color = color.yellow
+                elif type == 2:
+                    # continue
+                    this_color = color.blue
+                elif type == 3:
+                    continue
+                    this_color = color.red
+                if point[0] != layer:
+                    continue
+                else:
+                    sphere(pos=vector(point[0], point[1], point[2]), color=this_color, radius=0.2)
+                    if (self.if_out_of_range(point2, point)):
+                        pass
+                    else:
+                        c = curve(color=this_color, radius=0.1)
+
+                    c.append(vector(point[0], point[1], point[2]))
+
+                    point2 = point.copy()
         return scene
 
     def load_polymer(self, filepath):
@@ -169,15 +230,16 @@ class pyRoom(Room):
             except:
                 return polymerlist
 
-    def step_heating(self, start, end, step, EC_max):
+    def step_heating(self, start, end, step, time_length, time_step, EC_max):
         E_list, Ec_list, Ep_list, t_list = [], [], [], []
+        print(start, end, step)
         for i in np.arange(start, end, step):
-            self.movie(100000, 5000, i)
+            self.movie(time_length, time_step, i)
             E, Ec, Ep, Eb = self.get_result()
             E_list += E
             Ec_list += Ec
             Ep_list += Ep
-            t_list += [i] * 20
+            t_list += [i] * int(time_length / time_step)
             # self.save(i, i*1000)
         f = []
         for i in Ec_list:

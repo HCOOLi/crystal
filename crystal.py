@@ -14,6 +14,9 @@ class Room():
     def input_one_ECC(self, x, y, z, length, direction, ty, movable):
         pass
 
+    def input_one_FCC(self, x, y, z, length, direction, fold_direction, ty, movable):
+        pass
+
     def get_result(self):
         pass
 

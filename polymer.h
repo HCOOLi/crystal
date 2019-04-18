@@ -207,10 +207,12 @@ public:
 	int get_side_num(vec & p1, vec & p2) const;
 	vec cal_direction(const vec & point1, const vec & point2) const;
 
-	void input_one_ECC(vec init, int length, int direction, py::list type, int moveable);
-	void input_one_FCC(vec init, int length, int direction,int fold_direction, int type, int moveable);
+	void input_one_ECC(vec init, int length, int direction, py::list, int moveable);
+	void input_one_FCC(vec init, int length, int direction, int fold_direction, py::list , int moveable);
 
-	void py_input_one_ECC(int x, int y, int z, int length, int direction, py::list type, int moveable);//transmit
+	void py_input_one_ECC(int x, int y, int z, int length, int direction, py::list , int moveable);
+	void py_input_one_FCC(int x, int y, int z, int length, int direction, int fold_direction, py::list , int moveable);
+	//transmit
 
 
 
