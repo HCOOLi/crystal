@@ -281,17 +281,17 @@ class PaintFrame(wx.Frame):
     def ReadFile(self):
         if self.filename:
             try:
-                r = pyRoom(32, 32, 32, Ep=[[0, 0, 0], [0, 0, 2], [0, 2, 0]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
+                r = pyRoom(64, 64, 64, Ep=[[0, 0, 0], [0, 0, 2], [0, 2, 0]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
                 r.construct_by_pylist(r.load_polymer(filepath=self.filename))
                 # r.draw(path=loadpath)
                 r.draw_all()
-                r.draw_a_layer(0)
-                r.draw_a_layer(1)
-                r.draw_a_layer(2)
-                r.draw_a_layer(3)
-                r.draw_a_layer(4)
-                r.draw_a_layer(5)
-                r.draw_a_layer(6)
+                # r.draw_a_layer(0)
+                # r.draw_a_layer(1)
+                # r.draw_a_layer(2)
+                # r.draw_a_layer(3)
+                # r.draw_a_layer(4)
+                # r.draw_a_layer(5)
+                # r.draw_a_layer(6)
                 # data = pickle.load(f)
 
                 # self.paint.SetLinesData(data)

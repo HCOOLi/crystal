@@ -126,6 +126,8 @@ public:
 	const double b2a=0.5;
 	const double b2b=0.5;
 	const double b2c=0.5;
+	
+	double (Room:: * count_parallel)(vec &, vec&, deque<vec>&, int) const;
 
 	vector<Polymer> polymer_list;
 
@@ -136,6 +138,12 @@ public:
 	Room(int x, int y, int z, py::list Ep, py::list Eb ) : lattice(x, y, z), shape(vec{ x,y,z }) {
 		Ep_matrix.resize(py::len(Ep));
 		cout << py::len(Ep);
+		if (b2b > 0) {
+			count_parallel = &Room::count_parallel_B;
+		}
+		else {
+			count_parallel = &Room::count_parallel_A;
+		}
 		for (int i = 0; i < py::len(Ep); i++) {
 			py::list Ep_array = py::extract<py::list>(Ep[i]);
 			Ep_matrix[i].resize(py::len(Ep_array));
@@ -276,11 +284,11 @@ public:
 
 	double cal_Eb_point(vec & p) const;
 
-	double count_parallel_nearby(vec & point1, vec & point2, int i, int j, deque<vec>& que, int cal_type)const;
-	double count_parallel_nearby24(vec & point1, vec & point2, int i, int j, const  deque<vec>& que, int cal_type)const;
+	/*double count_parallel_nearby(vec & point1, vec & point2, int i, int j, deque<vec>& que, int cal_type)const;
+	double count_parallel_nearby24(vec & point1, vec & point2, int i, int j, const  deque<vec>& que, int cal_type)const;*/
 	double count_parallel_nearby_all(vec & point1, vec & point2, const deque<vec>& que, int cal_type) const;
-	double count_parallel_nearby8(vec & point1, vec & point2, int i, int j, deque<vec>& que, int cal_type)const;
-	double count_parallel(vec  &point1, vec&  point2, deque<vec>& que, int cal_type)const;
+	//double count_parallel_nearby8(vec & point1, vec & point2, int i, int j, deque<vec>& que, int cal_type)const;
+	double count_parallel_A(vec  &point1, vec&  point2, deque<vec>& que, int cal_type)const;
 	double count_parallel_B(vec & point1, vec & point2, deque<vec>& que, int cal_type) const;
 
 

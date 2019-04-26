@@ -26,61 +26,6 @@ class pyRoom(Room):
         self.input_one_FCC(int(a[0]), int(a[1]), int(a[2]), int(length), int(direction),
                            int(fold_direction), ty, int(movable))
 
-    def py_inputECC_with_small(self):
-
-        # vec
-        start_point = [0, 0, 0]
-        num = 0
-        self.a_layer = {}
-        self.b_layer = {}
-        self.c_layer = {}
-
-        for k in range(0, int(self.shape[2] * 3 / 4), 2):
-            self.c_layer[k] = []
-        for i in range(0, int(self.shape[0])):
-            self.a_layer[i] = []
-        for j in range(0, int(self.shape[1])):
-            self.b_layer[j] = []
-
-        for i in range(self.shape[0]):
-            for j in range(self.shape[1]):
-                if j % 2 == 0 or i % 2 == 0:
-                    for k in range(0, int(3 * self.shape[2] / 4), 2):
-                        self.a_layer[i].append(num)
-                        self.b_layer[j].append(num)
-                        self.c_layer[k].append(num)
-                        self.py_input_one_ECC([i, j, k + int(self.shape[2] / 8)], 2, 2, 2, 0)
-
-                        num += 1
-                else:
-                    # self.py_input_one_ECC([i, j, int(self.shape[2] / 8)], int(3 * self.shape[2] / 4), 2, 1, 0)
-                    # self.py_input_one_ECC([i, j, 1], int(self.shape[2] - 2), 2, 1, 0)
-                    self.py_input_one_ECC([i, j, 1], int(self.shape[2] / 2), 2, 1, 0)
-                    num += 1
-
-                pass
-
-    def remove_c_layer(self):
-
-        for k in range(0, int(self.shape[2] * 3 / 4), 2):
-            for i in self.c_layer[k]:
-                self.delete_chain(i)
-            yield
-        return
-        #   for i in self.c_layer[k]:
-        #       self.delete_chain(i)
-
-    def remove_a_layer(self, k):
-        if k >= self.shape[0]:
-            return
-        for i in self.a_layer[k]:
-            self.delete_chain(i)
-
-    def remove_b_layer(self, k):
-        if k >= self.shape[1]:
-            return
-        for i in self.b_layer[k]:
-            self.delete_chain(i)
 
     def save(self, file_path):
         parameters = {"Ep": self.Ep, "Eb": self.Eb}

@@ -108,6 +108,7 @@ void Room::py_input_one_FCC(int x, int y, int z, int length, int direction, int 
 void Room::input_one_circle(vec init, int length, int direction, int moveable) {
 
 }
+
 void Room::construct_by_pylist(py::list chain_list) {
 	
 	polymer_list.clear();
@@ -486,7 +487,7 @@ double Room::cal_dEp(deque<vec > &path)const
 	iter++;
 	while (iter != path.end()) {
 		v2 = (*iter);
-		num += count_parallel(v1, v2, path, 1);
+		num += ((this->*count_parallel))(v1, v2, path, 1);
 		v1 = v2;
 		iter++;
 	} 
@@ -585,7 +586,6 @@ double Room::cal_dEc_nearby(stack<vec> path)const
 
 
 }
-
 
 double Room::cal_dEp_nearby(stack<vec> path)
 {
@@ -711,7 +711,7 @@ double Room::cal_Ep()const
 		int length = polymer_list[i].length;
 		for (int j = 1; j < length; j++) {
 
-				num += count_parallel(polymer_list[i][j - 1]->location, polymer_list[i][j]->location, a, 1);
+				num += ((this->*count_parallel))(polymer_list[i][j - 1]->location, polymer_list[i][j]->location, a, 1);
 			
 		}
 	}
@@ -737,7 +737,7 @@ double Room::cal_one_Ep(int i)const
 	double num = 0;
 		int length = polymer_list[i].length;
 		for (int j = 1; j < length; j++) {
-			num += count_parallel(polymer_list[i][j - 1]->location, polymer_list[i][j]->location,a,0);
+			num += (this->*count_parallel)(polymer_list[i][j - 1]->location, polymer_list[i][j]->location,a,0);
 		}
 		return num;
 }
@@ -800,7 +800,7 @@ double Room::count_parallel_nearby_all(vec &point1, vec &point2,
 	}
 }
 
-double Room::count_parallel(vec &point1, vec &point2, deque<vec> & que,int cal_type)const
+double Room::count_parallel_A(vec &point1, vec &point2, deque<vec> & que,int cal_type)const
 {
 	double num = 0;
 	try {

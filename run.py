@@ -147,38 +147,20 @@ def washing_small_a_b(parameter):
     return
 
 
-def Inclusion_Complex(parameter):
-    Ep1, Ep12, Eb, T, length = parameter["Ep1"], parameter["Ep12"], parameter["Eb"], parameter["T"], parameter["length"]
-    Eb12 = Ep12
-    Ep12 = 0
-    # try:
-    print('Run task Ep=%f ,Eb=%f,T=%f,length=%d(%s)...' % (Ep1, Eb, T, length, os.getpid()))
-    start = time.time()
-    if not os.path.exists('Complex'):
-        os.mkdir('Complex')
-    r = pyRoom(32, 32, 32, Ep=[[0, 0, 0], [0, 0, 0], [0, 0, Ep1]], Eb=[[0, 0, 0], [0, 0, Eb12], [0, Eb12, 0]])
-    # r = pyRoom(32, 32, 32, Ep=[[0, 0, 0], [0, 0, Ep12], [0, Ep12, Ep1]], Eb=[[0, 0, Eb12], [0, 0, 0], [0, Eb12, 0]])
-    r.py_inputECC_with_small()
+class PBS_PBMS(Simulator):
+    def __init__(self):
+        super(Simulator, self).__init__()
 
-    r.movie(200000, 100, 100)
-    # r.draw(title="chain-%3.2f.json" % (T))
-    # r.save("Complex/chain-%3.2raw.json" % (T))
-    ###########################
-    r.movie(1000000, 100, T)
-    # r.draw(title="chain-%3.2f.json" % (T))
-    # r.save("Complex/chainEp-0,%3.2f,%3.2f,T=%3.2f.json" % (Ep1, Ep12, T))
-    r.save("Complex/chainEp-0,%3.2f,%3.2f,Eb=0,0,%3.2f,T=%3.2f.json" % (Ep1, Ep12, Eb12, T))
+        pass
 
-    end = time.time()
-    print('Task%f runs %0.2f seconds.' % (T, (end - start)))
+    def parameters(self):
+        pass
 
-    return
+    def run(self, parameter):
+        Ep1, Ep12, Eb, T, length = parameter["Ep1"], parameter["Ep12"], parameter["Eb"], parameter["T"], parameter[
+            "length"]
 
-
-def PBS_PBMS(parameter):
-    Ep1, Ep12, Eb, T, length = parameter["Ep1"], parameter["Ep12"], parameter["Eb"], parameter["T"], parameter["length"]
-
-    pass
+        pass
 
 
 def step_heating(parameter):
@@ -208,26 +190,32 @@ def step_heating(parameter):
 class SecondNuclear(Simulator):
     def __init__(self):
         super(Simulator, self).__init__()
-
+        if not os.path.exists('Complex'):
+            os.mkdir('Complex')
         pass
 
     def parameters(self):
         import itertools
-        Ep = list(np.arange(0.5, 1.6, 0.6))
+        Ep = list(np.arange(0.5, 1.4, 0.5))
 
         length = [128]
-        T = list(np.arange(4, 6, 0.2))
+        T = list(np.arange(4, 6, 0.5))
         return itertools.product(Ep, length, T)
 
     @staticmethod
     def install_model(r: pyRoom, num, length):
-        # for i in range(0, r.shape[1]):
-        r.py_input_one_FCC([0, 0, 0], length * length, 2, 1, [1] * length * length, 1)
+        for i in range(0, r.shape[1]):
+            r.py_input_one_ECC([0, i, 32], 8, 2, [1] * 8, 1)
+        # for i in range(0, r.shape[2],6):
+        #     r.py_input_one_ECC([10, 0, i], r.shape[1], 1, [0] * r.shape[1], 1)
+        #     r.py_input_one_ECC([54, 0, i], r.shape[1], 1, [0] * r.shape[1], 1)
 
-        # vec
+
         for i in range(1, r.shape[0] - 1):
+            # if i==10 or i==54:
+            #     continue
             for j in range(0, r.shape[1] - 1, 4):
-                r.py_input_one_FCC([i, j, 0], length * 4, 2, 1, [1] * length * 4, 0)
+                r.py_input_one_FCC([i, j, 0], 128, 2, 1, [1] * 128, 0)
 
 
     @staticmethod
@@ -240,19 +228,31 @@ class SecondNuclear(Simulator):
             EC_max = 31 * 31 * (31 - 1)
             if not os.path.exists('Data'):
                 os.mkdir('Data')
-            r = pyRoom(32, 32, 32, Ep=[[0, 0], [0, Ep]], Eb=[[0, 0], [0, 0]])
+            r = pyRoom(64, 64, 64, Ep=[[0, 0], [0, Ep]], Eb=[[0, 0], [0, 0]])
+            E_list, Ec_list, Ep_list, t_list = [], [], [], []
 
             SecondNuclear.install_model(r, 31 * 31, 31)
-
-            r.movie(1000000, 10000, 100)
+            # r.draw_all()
+            r.movie(1000000, 100000, 100)
             # r.movie(2000000, 10000, T*Ep)
-            # E_list, Ec_list, Ep_list, t_list, f = r.step_heating(6 * Ep+0.1, 1 * Ep, -0.1 * Ep,10000,5000, EC_max)
+            # # E_list, Ec_list, Ep_list, t_list, f = r.step_heating(6 * Ep+0.1, 1 * Ep, -0.1 * Ep,10000,5000, EC_max)
             r.save("Data/heated%3.2f-d.json" % (Ep))
-            # E_list, Ec_list, Ep_list, t_list, f = r.step_heating(6 * Ep+0.1, 1 * Ep, -0.1 * Ep+0.01,10000,5000, EC_max)
-            # plt.plot(t_list, f)
-            # plt.savefig("stepheating%3.2f.png" % (Ep))
-            r.movie(2000000, 10000, T * Ep)
-            r.save("Data/Ep=%3.2f,T=%3.2f.json" % (Ep, T * Ep))
+            # # E_list, Ec_list, Ep_list, t_list, f = r.step_heating(6 * Ep+0.1, 1 * Ep, -0.1 * Ep+0.01,10000,5000, EC_max)
+            # # plt.plot(t_list, f)
+            # # plt.savefig("stepheating%3.2f.png" % (Ep))
+            for i in range(4):
+                r.movie(2000000, 100000, T * Ep)
+                print("after movie%d" % (i))
+                E_result, Ec_result, Ep_result, Eb_result = r.get_result()
+                E_list += E_result
+                Ec_list += Ec_result
+                Ep_list += Ep_result
+                r.save("Data/no-stopE%d=%3.2f,T=%3.2f.json" % (i, Ep, T * Ep))
+
+            with open("Data/Ec_list,Ep2=%3.2f,T=%3.2f.json" % (Ep, T * Ep), 'w') as file:
+                # file.write(json.dumps(self.get_list()))
+                file.write(json.dumps(Ec_list))
+
         except Exception as e:
             print(e)
             raise e
@@ -268,7 +268,7 @@ if __name__ == '__main__':
     # S.simulate(parameter_list[1])
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
-        with Pool(10) as p:
+        with Pool(5) as p:
             p.map_async(S.simulate, parameter_list)
             p.close()
             p.join()
