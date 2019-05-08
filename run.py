@@ -147,20 +147,7 @@ def washing_small_a_b(parameter):
     return
 
 
-class PBS_PBMS(Simulator):
-    def __init__(self):
-        super(Simulator, self).__init__()
 
-        pass
-
-    def parameters(self):
-        pass
-
-    def run(self, parameter):
-        Ep1, Ep12, Eb, T, length = parameter["Ep1"], parameter["Ep12"], parameter["Eb"], parameter["T"], parameter[
-            "length"]
-
-        pass
 
 
 def step_heating(parameter):
@@ -196,42 +183,43 @@ class SecondNuclear(Simulator):
 
     def parameters(self):
         import itertools
-        Ep = list(np.arange(0.5, 1.4, 0.5))
-
-        length = [128]
-        T = list(np.arange(4, 6, 0.5))
-        return itertools.product(Ep, length, T)
+        Ep = [0.5, 1.0]
+        length = [64]
+        T = [4.5, 5, 5.2]
+        d = [5, 6, 7]
+        return itertools.product(Ep, d, T)
 
     @staticmethod
-    def install_model(r: pyRoom, num, length):
+    def install_model(r: pyRoom, d):
         for i in range(0, r.shape[1]):
-            r.py_input_one_ECC([0, i, 32], 8, 2, [1] * 8, 1)
-        # for i in range(0, r.shape[2],6):
-        #     r.py_input_one_ECC([10, 0, i], r.shape[1], 1, [0] * r.shape[1], 1)
-        #     r.py_input_one_ECC([54, 0, i], r.shape[1], 1, [0] * r.shape[1], 1)
+            r.py_input_one_ECC([0, i, 8], 8, 2, [1] * 8, 1)
+        for i in range(0, r.shape[2], d):
+            r.py_input_one_ECC([15, 0, i], r.shape[1], 1, [0] * r.shape[1], 1)
+        for i in range(0, r.shape[2], 3):
+            r.py_input_one_ECC([62, 0, i], r.shape[1], 1, [0] * r.shape[1], 1)
 
 
         for i in range(1, r.shape[0] - 1):
-            # if i==10 or i==54:
-            #     continue
-            for j in range(0, r.shape[1] - 1, 4):
-                r.py_input_one_FCC([i, j, 0], 128, 2, 1, [1] * 128, 0)
+            if i == 15 or i == 62:
+                continue
+            for j in range(0, r.shape[1] - 1, 2):
+                r.py_input_one_FCC([i, j, 0], 64, 2, 1, [1] * 64, 0)
 
 
     @staticmethod
     def simulate(parameter):
 
         try:
-            Ep, length, T = parameter[0], parameter[1], parameter[2]
+            Ep, d, T = parameter[0], parameter[1], parameter[2]
             print('Run task %f ,%f,%f(%s)...' % (Ep, 1, T, os.getpid()))
             start = time.time()
             EC_max = 31 * 31 * (31 - 1)
             if not os.path.exists('Data'):
                 os.mkdir('Data')
-            r = pyRoom(64, 64, 64, Ep=[[0, 0], [0, Ep]], Eb=[[0, 0], [0, 0]])
+            r = pyRoom(64, 32, 32, Ep=[[0, 0], [0, Ep]], Eb=[[0, 0], [0, 0]])
             E_list, Ec_list, Ep_list, t_list = [], [], [], []
 
-            SecondNuclear.install_model(r, 31 * 31, 31)
+            SecondNuclear.install_model(r, d)
             # r.draw_all()
             r.movie(1000000, 100000, 100)
             # r.movie(2000000, 10000, T*Ep)
@@ -240,14 +228,14 @@ class SecondNuclear(Simulator):
             # # E_list, Ec_list, Ep_list, t_list, f = r.step_heating(6 * Ep+0.1, 1 * Ep, -0.1 * Ep+0.01,10000,5000, EC_max)
             # # plt.plot(t_list, f)
             # # plt.savefig("stepheating%3.2f.png" % (Ep))
-            for i in range(4):
+            for i in range(8):
                 r.movie(2000000, 100000, T * Ep)
                 print("after movie%d" % (i))
                 E_result, Ec_result, Ep_result, Eb_result = r.get_result()
                 E_list += E_result
                 Ec_list += Ec_result
                 Ep_list += Ep_result
-                r.save("Data/no-stopE%d=%3.2f,T=%3.2f.json" % (i, Ep, T * Ep))
+                r.save("Data/d=%dE%d=%3.2f,T=%3.2f.json" % (d, i, Ep, T * Ep))
 
             with open("Data/Ec_list,Ep2=%3.2f,T=%3.2f.json" % (Ep, T * Ep), 'w') as file:
                 # file.write(json.dumps(self.get_list()))
@@ -268,7 +256,7 @@ if __name__ == '__main__':
     # S.simulate(parameter_list[1])
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
-        with Pool(5) as p:
+        with Pool(len(parameter_list) // 2) as p:
             p.map_async(S.simulate, parameter_list)
             p.close()
             p.join()

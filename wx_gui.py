@@ -285,14 +285,11 @@ class PaintFrame(wx.Frame):
                 r.construct_by_pylist(r.load_polymer(filepath=self.filename))
                 # r.draw(path=loadpath)
                 r.draw_all()
-                # r.draw_a_layer(0)
-                # r.draw_a_layer(1)
-                # r.draw_a_layer(2)
-                # r.draw_a_layer(3)
-                # r.draw_a_layer(4)
-                # r.draw_a_layer(5)
-                # r.draw_a_layer(6)
-                # data = pickle.load(f)
+                r.draw_a_layer(0)
+                r.draw_a_layer(1)
+                r.draw_a_layer(2)
+                r.draw_a_layer(10)
+
 
                 # self.paint.SetLinesData(data)
             except pickle.UnpicklingError:
