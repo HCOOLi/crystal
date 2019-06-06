@@ -400,6 +400,7 @@ void Room::movie(int m, int n, double T)
 			double dEc = cal_dEc_nearby(path)*Ec0;
 			double dEp = cal_dEp_nearby(path);
 			double dEb = cal_dEb_nearby(path);
+			//double dEf = cal_dEf(path);
 			double dE = dEc +dEp+ dEb;
 			
 			if (dE >= 0) {
@@ -512,6 +513,22 @@ double Room::cal_dEc(deque<vec > &path)const
 		iter++;
 	}
 	return -num;
+}
+
+double Room::cal_dEf(deque<vec> path) const
+{
+	double num = 0;
+	vec v1, v2;
+	deque<vec >::iterator iter = path.begin();
+	if (iter != path.end()) v1 = (*iter); else return num;
+	iter++;
+	while (iter != path.end()) {
+		v2 = (*iter);
+		num += ((this->*count_parallel))(v1, v2, path, 1);
+		v1 = v2;
+		iter++;
+	}
+	return num;
 }
 
 double Room::cal_one_Ec(int i)const
@@ -782,11 +799,11 @@ double Room::count_parallel_nearby_all(vec &point1, vec &point2,
 					num_self += 0.5*Ep_cross;
 				}
 				else {
-					num_self += 1*Ep_cross;
+					num_self += Ep_cross;
 				}
 			}
 			else {
-				num_others += 1*Ep_cross;
+				num_others += Ep_cross;
 			}
 		}
 	}

@@ -123,9 +123,9 @@ public:
 	const double Ec0=1.0;
 	vector<vector<double> > Eb_matrix;
 	vector<vector<double> > Ep_matrix;
-	const double b2a=0.5;
-	const double b2b=0.5;
-	const double b2c=0.5;
+	const double b2a=0.0;
+	const double b2b=0.0;
+	const double b2c=0.0;
 	
 	double (Room:: * count_parallel)(vec &, vec&, deque<vec>&, int) const;
 
@@ -153,29 +153,24 @@ public:
 				}
 				catch(exception& e){
 					cout << e.what();
-					cout << "int";
 					Ep_matrix[i][j] = py::extract<int>(Ep_array[j]);
 				}
 
 				//cout << i << "," << j<<endl;
 			}
 		}
-		cout << "Ep_matrix"<<endl;
 		Eb_matrix.resize(py::len(Eb));
 		for (int i = 0; i < py::len(Eb); i++) {
-			cout << 'b';
-
 			py::list Eb_array = py::extract<py::list>(Eb[i]);
 			Eb_matrix[i].resize(py::len(Eb_array));
 			for (int j = 0; j < py::len(Eb_array); j++) {
 				Eb_matrix[i][j] = py::extract<double>(Eb_array[j]);
 			}
 		}
-		//TODO
-		cout << "Eb_matrix"<<endl;
 		results = new py::list();
 		initmoves();
-		srand(1);
+		srand(time(NULL));
+		cout<< time(NULL);
 	}
 
 	//initiate
@@ -262,6 +257,7 @@ public:
 	double cal_Ec()const;
 	double cal_Ep()const;
 	double cal_Eb()const;
+	
 
 	double cal_one_Ec(int)const;
 	double cal_one_Ep(int)const;
@@ -269,6 +265,7 @@ public:
 
 	double cal_dEp(deque<vec> &path)const;
 	double cal_dEc(deque<vec> &path)const;
+	double cal_dEf(deque<vec> path) const;
 	//double cal_dEb(deque<vec> &path)const;
 
 	double cal_dEc_nearby(stack<vec> path)const;
