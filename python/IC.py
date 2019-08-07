@@ -74,7 +74,6 @@ class Inclusion_Complex(Simulator):
                 r.save("Complex/rand%dchain-%dEp-0,%3.2f,%3.2f,Eb=%3.2f,%3.2f,0,T=%3.2f.json" % (
                     np.random.randint(1, 50), i, 0, Ep12, 0, 0.1, T))
 
-
             end = time.time()
             print('Task%f runs %0.2f seconds.' % (T, (end - start)))
         except Exception as e:

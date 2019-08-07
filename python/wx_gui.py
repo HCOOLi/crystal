@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 import wx
@@ -20,6 +19,8 @@ class Showing(wx.Frame):
 
     def OnClick(self, event):
         self.button.SetLabel("Clicked")
+
+
 #
 # class PaintWindow(wx.Window):
 #     def __init__(self, parent, id):
@@ -286,10 +287,9 @@ class PaintFrame(wx.Frame):
                 # r.draw(path=loadpath)
                 r.draw_all()
                 # r.draw_a_layer(0)
-                # r.draw_a_layer(1)
+                # r.draw_a_layer_plot(1)
                 # r.draw_a_layer(2)
                 # r.draw_a_layer(15)
-
 
                 # self.paint.SetLinesData(data)
             except pickle.UnpicklingError:

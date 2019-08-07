@@ -7,6 +7,7 @@ from copy import deepcopy
 import time
 from pyroom import *
 
+
 class Simulator():
     def __init__(self):
         pass

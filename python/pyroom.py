@@ -1,17 +1,16 @@
-
 import json
 import math
 import matplotlib.pyplot as plt
 import os
 import time
 import numpy as np
-from crystal import Room
+from crystal import *
 from typing import Dict, List, Tuple
 
 
-class pyRoom(Room):
+class pyRoom(pyroom):
     def __init__(self, a, b, c, Ep, Eb):
-        Room.__init__(self, int(a), int(b), int(c), Ep, Eb)
+        pyroom.__init__(self, int(a), int(b), int(c), Ep, Eb, 4)
         self.shape = np.asarray([a, b, c])
         self.Ep = Ep
         self.Eb = Eb
@@ -26,13 +25,13 @@ class pyRoom(Room):
         self.input_one_FCC(int(a[0]), int(a[1]), int(a[2]), int(length), int(direction),
                            int(fold_direction), ty, int(movable))
 
-
     def save(self, file_path):
         parameters = {"Ep": self.Ep, "Eb": self.Eb}
         saving_dict = {"parameters": parameters, "data": self.get_list()}
         with open(file_path, 'w') as file:
             # file.write(json.dumps(self.get_list()))
             file.write(json.dumps(saving_dict))
+
     def new_draw_box(self, point1, point2, box_color='blue'):
         from vpython import canvas, vector, curve, color
         # def into_vector(a):
@@ -164,16 +163,199 @@ class pyRoom(Room):
                     point2 = point.copy()
         return scene
 
+    def draw_a_layer_plot(self, layer, polylist=None, title=None):
+
+        nums = self.get_num_of_polymers()
+        plt.figure(figsize=(10, 5))
+        ax1 = plt.subplot(1, 2, 1)
+        ax1.plot([0, 32], [8, 8])
+        ax1.plot([0, 32], [23, 23])
+        ax2 = plt.subplot(1, 2, 2)
+        countlist = []
+        count = 0
+        for i in range(nums):
+            chain = self.get_polymer(i)
+
+            # c = curve(color=color.yellow, radius=0.1)
+            last_point = None
+            if count != 0:
+                countlist.append(count)
+                count = 0
+            if chain:
+                last_point = chain.get_list()["chain"][0].copy()['position']
+                type = chain.get_list()["chain"][0].copy()["type"]
+                if type == 1:
+                    pass
+                    # this_color = color.yellow
+                elif type == 2:
+                    pass
+                    # continue
+                    # this_color = color.blue
+                elif type == 3:
+                    continue
+                    # this_color = color.red
+
+                # c = curve(color=this_color, radius=0.1)
+                last_point = None
+                if count != 0:
+                    countlist.append(count)
+                    count = 0
+            else:
+                continue
+
+            for pointinfo in chain.get_list()["chain"]:
+                point = pointinfo['position']
+                type = pointinfo["type"]
+                if type == 1:
+                    pass
+                    # this_color = color.yellow
+                elif type == 2:
+                    pass
+                    # continue
+                    # this_color = color.blue
+                elif type == 3:
+                    continue
+                if point[0] != layer:
+                    continue
+                else:
+                    # sphere(pos=vector(point[0], point[1], point[2]), color=this_color, radius=0.2)
+                    if last_point != None:
+                        if (self.if_out_of_range(last_point, point)):
+                            pass
+                        else:
+                            last_point = None
+                    if last_point != None:
+                        if point[1] == last_point[1] and 8 <= min(point[2], last_point[2]) and max(point[2],
+                                                                                                   last_point[2]) < 24:
+                            ax1.plot([point[1], last_point[1]], [point[2], last_point[2]], color="red")
+                            count += 1
+                        else:
+                            ax1.plot([point[1], last_point[1]], [point[2], last_point[2]], color="blue")
+                            if count != 0:
+                                countlist.append(count)
+                                count = 0
+                    last_point = point.copy()
+
+            point2 = None
+            if count != 0:
+                countlist.append(count)
+                count = 0
+        plt.figure()
+        histlist, bins, _ = plt.hist(countlist, bins=range(1, 17, 1))
+        # print(histlist, bins)
+        plt.close()
+        # countlist
+
+        ax2.bar(bins[:-1], np.asarray(histlist) * np.asarray(bins[:-1]))
+        plt.ylim(0, 80)
+        plt.xlim(0, 16)
+
+        # plt.show()
+
+        # return scene
+
+    def draw_a_layer_plot_json(self, layer, polylist, title=None):
+        plt.figure(figsize=(10, 5))
+        ax1 = plt.subplot(1, 2, 1)
+        ax1.plot([0, 32], [8, 8])
+        ax1.plot([0, 32], [23, 23])
+        ax2 = plt.subplot(1, 2, 2)
+        countlist = []
+        count = 0
+        for chain in polylist:
+            # c = curve(color=color.yellow, radius=0.1)
+            last_point = None
+            if count != 0:
+                countlist.append(count)
+                count = 0
+            if chain:
+                last_point = chain["c"][0].copy()['p']
+                type = chain["c"][0].copy()["t"]
+                if type == 1:
+                    pass
+                    # this_color = color.yellow
+                elif type == 2:
+                    pass
+                    # continue
+                    # this_color = color.blue
+                elif type == 3:
+                    continue
+                    # this_color = color.red
+
+                # c = curve(color=this_color, radius=0.1)
+                last_point = None
+                if count != 0:
+                    countlist.append(count)
+                    count = 0
+            else:
+                continue
+
+            for pointinfo in chain["c"]:
+                point = pointinfo['p']
+                type = pointinfo["t"]
+                if type == 1:
+                    pass
+                    # this_color = color.yellow
+                elif type == 2:
+                    pass
+                    # continue
+                    # this_color = color.blue
+                elif type == 3:
+                    continue
+                if point[0] != layer:
+                    continue
+                else:
+                    # sphere(pos=vector(point[0], point[1], point[2]), color=this_color, radius=0.2)
+                    if last_point != None:
+                        if (self.if_out_of_range(last_point, point)):
+                            pass
+                        else:
+                            last_point = None
+                    if last_point != None:
+                        if point[1] == last_point[1] and 8 <= min(point[2], last_point[2]) and max(point[2],
+                                                                                                   last_point[2]) < 24:
+                            ax1.plot([point[1], last_point[1]], [point[2], last_point[2]], color="red")
+                            count += 1
+                        else:
+                            ax1.plot([point[1], last_point[1]], [point[2], last_point[2]], color="blue")
+                            if count != 0:
+                                countlist.append(count)
+                                count = 0
+                    last_point = point.copy()
+
+            point2 = None
+            if count != 0:
+                countlist.append(count)
+                count = 0
+        plt.figure()
+        histlist, bins, _ = plt.hist(countlist, bins=range(1, 17, 1))
+        # print(histlist, bins)
+        plt.close()
+        # countlist
+
+        ax2.bar(bins[:-1], np.asarray(histlist) * np.asarray(bins[:-1]))
+        plt.ylim(0, 80)
+        plt.xlim(0, 16)
+
+        # plt.show()
+
+        # return scene
+
     def load_polymer(self, filepath):
         T = 0
         time = 1
         with open(filepath, 'r') as file:
             all_line_txt = file.readline()  # 读所有行
+            all_line_txt = all_line_txt.replace("position", "p").replace("type", "t").replace("chain", "c").replace(
+                "moveable", "m")
             polymerlist = json.loads(all_line_txt)
-            try:
-                return polymerlist['data']
-            except:
-                return polymerlist
+        with open(filepath, 'w') as file:
+            file.writelines(all_line_txt)
+
+        try:
+            return polymerlist['data']
+        except:
+            return polymerlist
 
     def step_heating(self, start, end, step, time_length, time_step, EC_max):
         E_list, Ec_list, Ep_list, t_list = [], [], [], []
@@ -246,6 +428,3 @@ class pyRoom(Room):
         plt.scatter(x=np.asarray(plot_list)[:, 0], y=np.asarray(plot_list)[:, 1])
         plt.show()
         return np.mean(np.asarray(sort_list[:5]))
-
-
-

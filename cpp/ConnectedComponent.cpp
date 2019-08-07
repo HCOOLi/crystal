@@ -26,7 +26,7 @@ namespace matrix {
 		return o;
 	}
 
-	py::list labeling_nearby(const Matrix3 & bitmap, Matrix3 & label, stack<vec3 > & que, int index) {
+	void labeling_nearby(const Matrix3 & bitmap, Matrix3 & label, stack<vec3 > & que, int index) {
 		static  vector<vec3> direction = { {-1,0,0},{1,0,0},{0,-1,0},{0,1,0} ,{0,0,1} };
 		array<int, 6> a{ 0,0,0,bitmap.shape[0],bitmap.shape[1] ,bitmap.shape[2] };
 		while (!que.empty())
@@ -59,10 +59,10 @@ namespace matrix {
 				}
 			}
 		}
-		py::list * results = new py::list;
-		for (int i = 0; i < 6; i++)
-			 results->append(a[i]) ;
-		return *results;
+		//py::list * results = new py::list;
+		//for (int i = 0; i < 6; i++)
+		//	 results->append(a[i]) ;
+		//return *results;
 
 	}
 	void prelabeling_nearby(const Matrix3 & bitmap, Matrix3 & label, stack<vec3 > & que, int index) {
@@ -99,10 +99,10 @@ namespace matrix {
 		}
 	}
 
-	py::list ConnectedComponentLabeling(const Matrix3 & bitmap) {
+	void ConnectedComponentLabeling(const Matrix3 & bitmap) {
 		Matrix3 label(bitmap.shape);
 		stack<vec3 > que;
-		py::list *results = new py::list;
+		
 		int label_index = 0;
 		for (int k = 0; k < bitmap.shape[2]; k++) {
 			int count_1 = 0;
@@ -138,7 +138,7 @@ namespace matrix {
 						label_index++;
 						label[i][j][k] = label_index;
 						que.emplace(vec3{ i,j,k });
-						results->append(labeling_nearby(bitmap, label, que, label_index));
+						//results->append(labeling_nearby(bitmap, label, que, label_index));
 					}
 					else {
 						label[i][j][k] = -1;
@@ -148,6 +148,6 @@ namespace matrix {
 
 		}
 	}
-		return *results;
+		//return *results;
 	}
 }

@@ -40,8 +40,8 @@ inline bool operator<(const vec &a, const vec &b) {
 	}
 	return false;
 }
-inline  double operator*(const vec &a, const vec &b) {
-	double sum = 0;
+inline  int operator*(const vec &a, const vec &b) {
+	int sum = 0;
 	for (int i = 0; i < 3; i++) {
 		sum += a[i] * b[i];
 	}

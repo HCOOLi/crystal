@@ -1,8 +1,8 @@
 # It's of no use
 # It's just for the hints of IDE
 
-class Room():
-    def __init__(self, a, b, c, Ep, Eb):
+class pyroom():
+    def __init__(self, a, b, c, Ep, Eb, type):
         pass
 
     def get_list(self):
@@ -40,4 +40,5 @@ class Room():
 
     def cal_thickness(self):
         pass
+
     pass

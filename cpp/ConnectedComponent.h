@@ -4,12 +4,11 @@
 #include<stack>
 #include<vector>
 #include<array>
-#include<boost/python.hpp>
+
 
 
 using namespace std;
 namespace matrix {
-	namespace py = boost::python;
 	typedef array<int, 2> vec2;
 	typedef array<int, 3> vec3;
 	inline vec2 operator+(const vec2&v1, const vec2&v2) {
@@ -139,6 +138,6 @@ namespace matrix {
 		}
 	}
 
-	py::list labeling_nearby(const Matrix3 & bitmap, Matrix3 & label, stack<vec3 > & que, int index);
-	py::list ConnectedComponentLabeling(const Matrix3 & bitmap);
+	//py::list labeling_nearby(const Matrix3 & bitmap, Matrix3 & label, stack<vec3 > & que, int index);
+	//py::list ConnectedComponentLabeling(const Matrix3 & bitmap);
 }
