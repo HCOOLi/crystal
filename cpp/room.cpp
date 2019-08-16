@@ -10,7 +10,10 @@ inline bool find_in_que(const deque<vec> &que, vec p) {
 	auto iter = std::find(que.begin(), que.end(), p);
 	return iter != que.end() ? true : false;
 }
-Room::Room(int x, int y, int z, vector<vector<double> > Ep, vector<vector<double> > Eb,int type) : lattice(x, y, z), shape(vec{ x,y,z }) {
+
+Room::Room(int x, int y, int z,
+           vector<vector<double> > Ep, vector<vector<double> > Eb, int type)
+        : lattice(x, y, z), shape(vec{x, y, z}) {
 	Ep_matrix = Ep;
 	Eb_matrix = Eb;
 	if (type==4) {
@@ -262,7 +265,7 @@ bool Room::canMove(vec & point, vec & direction)const
 		}
 		vec p_next = (point + direction) % shape;
 		if (lattice[p_next] == nullptr) {
-			if (intersect(point, p_next) == false)
+            if (!intersect(point, p_next))
 				return true;
 		}
 		return false;
@@ -426,8 +429,8 @@ void Room::movie(int m, int n, double T)
 void Room::save()
 {
 	ofstream file("polymer.txt");
-	for (int i = 0; i < polymer_list.size(); i++) {
-		file << polymer_list[i] << endl;
+    for (auto &p : polymer_list) {
+        file << p << endl;
 	}
 	file.close();
 }
@@ -440,11 +443,11 @@ void Room::load()
 double Room::cal_Ec()const
 {
 	double num = 0;
-	for (int i = 0; i < polymer_list.size(); i++) {
-		int length = polymer_list[i].length;
+    for (const auto &p : polymer_list) {
+        int length = p.length;
 		for (int j = 2; j < length; j++) {
-			num += cal_ifline(polymer_list[i][j - 2]->location,
-				polymer_list[i][j - 1]->location, polymer_list[i][j]->location);
+            num += cal_ifline(p[j - 2]->location,
+                              p[j - 1]->location, p[j]->location);
 		}
 	}
 
@@ -458,7 +461,7 @@ double Room::cal_dEp(deque<vec > &path)const
 
 	double num = 0;
 	vec v1, v2;
-	deque<vec >::iterator iter = path.begin();
+    auto iter = path.begin();
 	if (iter != path.end()) v1 = (*iter); else return num;
 	iter++;
 	while (iter != path.end()) {
@@ -475,7 +478,7 @@ double Room::cal_dEc(deque<vec > &path)const
 
 	double num = 0;
 	vec v1, v2, v3;
-	deque<vec >::iterator iter = path.begin();
+    auto iter = path.begin();
 	if (iter != path.end()) v1 = (*iter); else return num;
 	iter++;
 	if (iter != path.end()) v2 = (*iter); else return num;
@@ -494,7 +497,7 @@ double Room::cal_dEf(deque<vec> path) const
 {
 	double num = 0;
 	vec v1, v2;
-	deque<vec >::iterator iter = path.begin();
+    auto iter = path.begin();
 	if (iter != path.end()) v1 = (*iter); else return num;
 	iter++;
 	while (iter != path.end()) {
@@ -509,11 +512,11 @@ double Room::cal_dEf(deque<vec> path) const
 double Room::cal_one_Ec(int i)const
 {//has some bugs
 	double num = 0;
-	for (int i = 0; i < polymer_list.size(); i++) {
-		int length = polymer_list[i].length;
+    for (const auto &p : polymer_list) {
+        int length = p.length;
 		for (int j = 2; j < length; j++) {
-			num += cal_ifline(polymer_list[i].chain[j - 2]->location,
-				polymer_list[i].chain[j - 1]->location, polymer_list[i].chain[j]->location);
+            num += cal_ifline(p.chain[j - 2]->location,
+                              p.chain[j - 1]->location, p.chain[j]->location);
 		}
 	}
 	return -num;
@@ -698,11 +701,11 @@ double Room::cal_Ep()const
 	double num = 0;
 	deque<vec> a;
 
-	for (int i = 0; i < polymer_list.size(); i++) {
-		int length = polymer_list[i].length;
+    for (const auto &p : polymer_list) {
+        int length = p.length;
 		for (int j = 1; j < length; j++) {
 
-			num += ((this->*count_parallel))(polymer_list[i][j - 1]->location, polymer_list[i][j]->location, a, 1);
+            num += ((this->*count_parallel))(p[j - 1]->location, p[j]->location, a, 1);
 
 		}
 	}
@@ -953,6 +956,7 @@ double Room::cal_average_thick() const
 
 double Room::count_parallel_B(vec &point1, vec &point2,
 	deque<vec> & que, int cal_type)const {
+    //cout << __FUNCTION__ << endl;
 
 	double num_self = 0, num_others = 0;
 	int chain_num;
@@ -968,11 +972,27 @@ double Room::count_parallel_B(vec &point1, vec &point2,
 			continue;
 		}
 		for (int i = 0; i < 5; i++) {
+            if (i == 1) {
+
+            }
 			p1 = (point1 + i * direc) % shape;
 			p2 = (point2 + i * direc) % shape;
 			int result = get_side_num(p1, p2);
-			if (result == -1) { break; }
+            if (result == -1) {
+                break;
+            }
 			else {
+                if (i == 0) {
+                    if (result == chain_num) {
+                        if (find_in_que(que, p1) && find_in_que(que, p2)) {
+                            num_self -= 0.5;
+                        } else {
+                            num_self -= 1;
+                        }
+                    } else {
+                        num_others -= 1;
+                    }
+                }
 				if (result == chain_num) {
 					if (find_in_que(que, p1) && find_in_que(que, p2)) {
 						num_self += 0.5*pow(this->b2a, i);
@@ -996,7 +1016,7 @@ double Room::count_parallel_B(vec &point1, vec &point2,
 		if (num_self != 0) {
 			//cout << num_others << ',' << num_self << endl; 
 		}
-		return num_others + num_self;
+        return num_others + num_self;// TODO
 	}
 }
 
@@ -1004,6 +1024,7 @@ double Room::count_parallel_B(vec &point1, vec &point2,
 
 double Room::cal_Rg()const// 均方旋转半径
 {
+    throw "NOT DONE!";
 	double num = 0;
 	for (auto &p : polymer_list) {
 		//vec center = p.get_center();
@@ -1161,7 +1182,7 @@ vector<int> Room::cal_thickness()const//计算厚度
 			}
 		}
 	}
-
+    return vector<int>();
 	/*matrix::ConnectedComponentLabeling(temp_lattice);
 	return matrix::ConnectedComponentLabeling(temp_lattice);*/
 }
@@ -1265,4 +1286,5 @@ vector<int> Room::cal_thick_by_point()const//计算厚度
 	*/
 
 	//return thickness;
+    return vector<int>();
 }

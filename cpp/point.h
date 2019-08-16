@@ -14,7 +14,8 @@ public:
 	
 
 public:
-	Point() {}
+    Point() = default;
+
 	Point(vec loc, int c_num, int p_i_c,int ty=1, int moveable = 0) :
 		location(loc), chain_num(c_num),type(ty), pos_in_chain(p_i_c), moveable(moveable) {}
 

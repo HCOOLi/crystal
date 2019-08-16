@@ -11,11 +11,11 @@ using namespace std;
 
 class Grid {
 public:
-	vec shape;
+    vec shape{};
 	vector<vector< vector<shared_ptr< Point> > > > lattice;
 	//array<array<array< > > > 
 
-	Grid() {};
+    Grid() = default;
 
 	shared_ptr< Point>  & operator[](const vec &P) {
 		//const static vec b{ 0,0,0 };
@@ -54,7 +54,7 @@ public:
 	const double Ec0 = 1.0;
 	vector<vector<double> > Eb_matrix;
 	vector<vector<double> > Ep_matrix;
-	const double b2a = 0.0;
+    const double b2a = 0.5;//TODO
 	const double b2b = 0.0;
 	const double b2c = 0.0;
 
@@ -71,8 +71,7 @@ public:
 		if (type == 4) {
 			cout << "using type4" << endl;
 			count_parallel = &Room::count_parallel_nearby8;
-		}
-		else if (abs(b2b) > 0) {
+        } else if (abs(b2a) > 1e-10) {
 			count_parallel = &Room::count_parallel_B;
 		}
 		else {
@@ -191,6 +190,6 @@ public:
 		return polymer_list.size();
 	}
 
-	~Room() {}
+    ~Room() = default;
 };
 

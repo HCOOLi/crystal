@@ -4,16 +4,56 @@ using namespace std;
 
 namespace py = boost::python;
 
-vector<int> pylist2vector(py::list list) {
-	vector<int> result;
+pyroom::pyroom(int x, int y, int z, py::list Ep, py::list Eb, int type) : Room(x, y, z, type) {
+    Ep_matrix.resize(py::len(Ep));
+    cout << py::len(Ep);
+    for (int i = 0; i < py::len(Ep); i++) {
+        py::list Ep_array = py::extract<py::list>(Ep[i]);
+        Ep_matrix[i].resize(py::len(Ep_array));
+        for (int j = 0; j < py::len(Ep_array); j++) {
+            try {
+                Ep_matrix[i][j] = py::extract<double>(Ep_array[j]);
+            }
+            catch (exception &e) {
+                cout << e.what();
+                Ep_matrix[i][j] = py::extract<int>(Ep_array[j]);
+            }
+        }
+    }
+    Eb_matrix.resize(py::len(Eb));
+    for (int i = 0; i < py::len(Eb); i++) {
+        py::list Eb_array = py::extract<py::list>(Eb[i]);
+        Eb_matrix[i].resize(py::len(Eb_array));
+        for (int j = 0; j < py::len(Eb_array); j++) {
+            Eb_matrix[i][j] = py::extract<double>(Eb_array[j]);
+        }
+    }
+    results = new py::list();
+    cout << "construction complete" << endl;
+    //cout<< time(NULL);
+}
+
+
+template<typename T>
+vector<T> pylist2vector(py::list list) {
+    vector<T> result;
 	for (int i = 0; i < py::len(list); i++) {
-		int x = py::extract<int>(list[i]);
+        T x = py::extract<T>(list[i]);
 		result.push_back(x);
 	}
 	return result;
 
 
 }
+//map<string,double> pydict2map(py::dict list) {
+//	vector<int> result;
+//	for (int i = 0; i < py::len(list); i++) {
+//		int x = py::extract<int>(list[i]);
+//		result.push_back(x);
+//	}
+//	return result;
+//
+//}
 
 void pyroom::construct_by_pylist(py::list chain_list) {
 
@@ -51,7 +91,7 @@ void pyroom::construct_by_pylist(py::list chain_list) {
 
 void pyroom::input_one_ECC(int x, int y, int z, int length, int direction, py::list type, int moveable)
 {
-	vector<int> typearray = pylist2vector(type);
+    vector<int> typearray = pylist2vector<int>(type);
 	//cout << __FUNCTION__ << endl;
 	//cout << typearray.size() << ',' << py::len(type) << endl;
 	Room::input_one_ECC(vec{ x,y,z }, length, direction, typearray, moveable);
@@ -60,37 +100,9 @@ void pyroom::input_one_ECC(int x, int y, int z, int length, int direction, py::l
 
 void pyroom::input_one_FCC(int x, int y, int z, int length, int direction, int fold_direction, py::list type, int moveable)
 {
-	vector<int> typearray = pylist2vector(type);
+    vector<int> typearray = pylist2vector<int>(type);
 	//cout << __FUNCTION__ << endl;
 	//cout << typearray.size() << ',' << py::len(type) << endl;
 	Room::input_one_FCC(vec{ x,y,z }, length, direction, fold_direction, typearray, moveable);
 	//cout << "input finished"<< endl;
-}
-pyroom::pyroom(int x, int y, int z, py::list Ep, py::list Eb,int type):Room(x,y,z,type) {
-	Ep_matrix.resize(py::len(Ep));
-	cout << py::len(Ep);
-	for (int i = 0; i < py::len(Ep); i++) {
-		py::list Ep_array = py::extract<py::list>(Ep[i]);
-		Ep_matrix[i].resize(py::len(Ep_array));
-		for (int j = 0; j < py::len(Ep_array); j++) {
-			try {
-				Ep_matrix[i][j] = py::extract<double>(Ep_array[j]);
-			}
-			catch (exception& e) {
-				cout << e.what();
-				Ep_matrix[i][j] = py::extract<int>(Ep_array[j]);
-			}
-		}
-	}
-	Eb_matrix.resize(py::len(Eb));
-	for (int i = 0; i < py::len(Eb); i++) {
-		py::list Eb_array = py::extract<py::list>(Eb[i]);
-		Eb_matrix[i].resize(py::len(Eb_array));
-		for (int j = 0; j < py::len(Eb_array); j++) {
-			Eb_matrix[i][j] = py::extract<double>(Eb_array[j]);
-		}
-	}
-	results = new py::list();
-	cout << "construction complete"<<endl;
-	//cout<< time(NULL);
 }

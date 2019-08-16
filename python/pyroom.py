@@ -10,7 +10,7 @@ from typing import Dict, List, Tuple
 
 class pyRoom(pyroom):
     def __init__(self, a, b, c, Ep, Eb):
-        pyroom.__init__(self, int(a), int(b), int(c), Ep, Eb, 4)
+        pyroom.__init__(self, int(a), int(b), int(c), Ep, Eb, 24)
         self.shape = np.asarray([a, b, c])
         self.Ep = Ep
         self.Eb = Eb

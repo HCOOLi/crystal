@@ -33,7 +33,7 @@ class SecondNuclear(Simulator):
         import itertools
         Ep = [1.0]
         length = [64]
-        T = [2.3, 2.5, 2.6, 2.8]
+        T = [3.3, 3.5, 3.6, 3.8]
         d = [0]
         return itertools.product(Ep, d, T)
 
@@ -62,8 +62,8 @@ class SecondNuclear(Simulator):
             EC_max = 31 * 31 * (31 - 1)
             if not os.path.exists('Data'):
                 os.mkdir('Data')
-            if not os.path.exists('Data/2019-6-18/'):
-                os.mkdir('Data/2019-6-18/')
+            if not os.path.exists('Data/2019-8-13/'):
+                os.mkdir('Data/2019-8-13/')
             r = pyRoom(32, 32, 32, Ep=[[0, 0], [0, Ep]], Eb=[[0, 0], [0, 0]])
             E_list, Ec_list, Ep_list, t_list = [], [], [], []
 
@@ -85,7 +85,7 @@ class SecondNuclear(Simulator):
                 # E_list += E_result
                 # Ec_list += Ec_result
                 # Ep_list += Ep_result
-                r.save("Data/2019-6-18/d=%dE%d=%3.2f,T=%3.2f.json" % (d, i, Ep, T * Ep))
+                r.save("Data/2019-8-13/d=%dE%d=%3.2f,T=%3.2f.json" % (d, i, Ep, T * Ep))
 
             # with open("Data/Ec_list,Ep2=%3.2f,T=%3.2f.json" % (Ep, T * Ep), 'w') as file:
             #     # file.write(json.dumps(self.get_list()))

@@ -19,20 +19,16 @@ public:
 	int length;
 	int type=1;
 
-	Polymer() {};
+    Polymer() noexcept = default;;
 	Polymer(const Polymer & p) {
 		chain = p.chain;
 		length = p.length;
 		type = p.type;
 	};
 
-	Polymer & operator=(const Polymer & p) {
-		chain = p.chain;
-		length = p.length;
-		type = p.type;
-		return *this;
-	}
-	Polymer & operator=(Polymer && p) {
+    Polymer &operator=(const Polymer &p) = default;
+
+    Polymer &operator=(Polymer &&p) noexcept {
 		chain = move(p.chain);
 		length = p.length;
 		type = p.type;
@@ -41,7 +37,7 @@ public:
 		return *this;
 	}
 
-	Polymer(Polymer && p) {
+    Polymer(Polymer &&p) noexcept {
 		chain = move(p.chain);
 		length = p.length;
 
@@ -50,7 +46,7 @@ public:
 		p.length = 0;
 	};
 
-	Polymer(int l) : length(l) {}
+    explicit Polymer(int l) : length(l) {}
 	//int get_type() {
 	//	//return type;
 	//}

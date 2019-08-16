@@ -18,7 +18,8 @@ public:
 };
 class SecondNuclear :public Simulator {
 public:
-	SecondNuclear(){}
+    SecondNuclear() = default;
+
 	void install_model(Room &pyRoom) {
 		//for i in range(0, r.shape[1]) :
 		//	r.py_input_one_ECC([0, i, 8], 16, 2, [1] * 16, 1)
@@ -34,7 +35,8 @@ public:
 		//		for j in range(0, r.shape[1] - 1, 2) :
 		//			r.py_input_one_FCC([i, j, 0], 128, 2, 1, [1] * 128, 0)
 	}
-	void simulate(){}
+
+    void simulate() override {}
 	/*def __init__(self) :
 		super(Simulator, self).__init__()
 		if not os.path.exists('Complex') :

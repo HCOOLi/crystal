@@ -5,13 +5,13 @@ from multiprocessing import Pool
 
 from pyroom import *
 
-path = r'./Data/2019-6-18/'
-picpath = r'./Data/2019-6-18-1.0-2.00/'
+path = r'./Data/2019-8-13/'
+picpath = r'./Data/2019-8-13-1.0-3.80/'
 if not os.path.exists(picpath):
     os.mkdir(picpath)
 
 for i in range(355):
-    filename = "d=0E%d=1.00,T=2.00.json" % i
+    filename = "d=0E%d=1.00,T=3.80.json" % i
     r = pyRoom(64, 64, 64, Ep=[[0, 0, 0], [0, 0, 2], [0, 2, 0]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]])
     print(path + filename)
     polymerlist = r.load_polymer(filepath=path + filename)

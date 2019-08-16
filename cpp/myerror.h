@@ -5,14 +5,15 @@
 
 #define DEBUG
 // error types //To be done
-class WrongPoint:public exception{ 
-public: 
-	WrongPoint(string a,vec b) {
+class WrongPoint:public exception{
+public:
+    WrongPoint(string &a, vec b) {
 		std::cerr << this->what();
 		std::cerr << a;
 		std::cerr << b;
 	}
-	WrongPoint(vec b) {
+
+    explicit WrongPoint(vec b) {
 		std::cerr << this->what();
 		std::cerr << b;
 	}

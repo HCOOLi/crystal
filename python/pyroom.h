@@ -1,6 +1,8 @@
 #pragma once
 #include"boost/python.hpp"
 #include"../cpp/room.h"
+#include<map>
+
 using namespace std;
 
 namespace py = boost::python;
