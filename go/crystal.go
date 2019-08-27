@@ -4,5 +4,6 @@ import "C"
 
 import "fmt"
 func main(){
-    CRoom:=C.newRoom(32, 32, 32, 4);
+    for i:=0;i<10;i++{
+    CRoom:=C.newRoom(32, 32, 32, 4);}
 }

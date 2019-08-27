@@ -9,19 +9,19 @@ from typing import Dict, List, Tuple
 
 
 class pyRoom(pyroom):
-    def __init__(self, a, b, c, Ep, Eb):
-        pyroom.__init__(self, int(a), int(b), int(c), Ep, Eb, 24)
+    def __init__(self, a, b, c, Ep, Eb, roomtype):
+        pyroom.__init__(self, int(a), int(b), int(c), Ep, Eb, int(roomtype))
         self.shape = np.asarray([a, b, c])
         self.Ep = Ep
         self.Eb = Eb
 
-    def py_input_one_ECC(self, a: List[int], length: int, direction: int, ty: List, movable: int) -> None:
+    def py_input_one_ECC(self, a, length, direction, ty, movable):
+        # type: (List[int], int, int, List, int) -> None
 
         self.input_one_ECC(int(a[0]), int(a[1]), int(a[2]), int(length), int(direction), ty, int(movable))
 
-    def py_input_one_FCC(self, a: List[int], length: int, direction: int, fold_direction: int, ty: List,
-                         movable: int) -> None:
-
+    def py_input_one_FCC(self, a, length, direction, fold_direction, ty, movable):
+        # type: (List[int], int, int, int, List, int) -> None
         self.input_one_FCC(int(a[0]), int(a[1]), int(a[2]), int(length), int(direction),
                            int(fold_direction), ty, int(movable))
 

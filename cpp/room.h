@@ -66,22 +66,8 @@ public:
 	Polymer &  get_polymer(int i) {
 		return polymer_list[i];
 	}
-	Room(int x, int y, int z, int type=24) : lattice(x, y, z), shape(vec{ x,y,z }) {
-		cout << "construction" << endl;
-		if (type == 4) {
-			cout << "using type4" << endl;
-			count_parallel = &Room::count_parallel_nearby8;
-        } else if (abs(b2a) > 1e-10) {
-			count_parallel = &Room::count_parallel_B;
-		}
-		else {
-			count_parallel = &Room::count_parallel_nearby24;
-		}
 
-		initmoves();
-		srand(time(NULL));
-		//cout<< time(NULL);
-	}
+    Room(int x, int y, int z, int type = 24);
 	Room(int x, int y, int z, vector<vector<double> > Ep, vector<vector<double> > Eb,int type);
 
 	void initmoves();
@@ -112,6 +98,8 @@ public:
 	void stepMove(vec &position, vec &next_position, stack<vec> & path);
 	void localSnakeMove(int i, stack<vec > &path);
 	void movie(int m, int n, double T);
+
+    void preheat(int m);
 	stack<vec> repair(stack<vec > &path);
 	//calculate something
 	void lazy_delete_chain(int i) {

@@ -1,19 +1,47 @@
 #pragma once
 #include<vector>
 #include<functional>
+#include<regex>
 #include"room.h"
+#include <tuple>
 using namespace std;
+
+template<class First, class Second>
+auto Cartesian_product(vector<First> F, vector<Second> S) -> vector<tuple<First, Second >> {
+    vector<tuple<First, Second >> result;
+    for (auto f:F) {
+        for (const auto &s:S) {
+            result.push_back(std::make_tuple(f, s));
+        }
+    }
+    return result;
+}
+
+template<class First, class... Args>
+auto Cartesian_product(vector<First> F, vector<Args> ... rests) -> vector<tuple<First, Args ... >> {
+    vector<tuple<First, Args ... >> result;
+    auto rest_results = Cartesian_product(rests...);
+    for (auto f:F) {
+        for (const auto &r:rest_results) {
+            result.push_back(tuple_cat(std::make_tuple(f), r));
+        }
+    }
+    return result;
+
+}
+
+//
 class Simulator {
 public:
-	/*template<class F, class... Args>*/
-	/*vector<tuple<Args...> > parameter(F &&f,Args && ... args) {
-		vector<tuple<Args...>> result;
-		result.push_back(tuple<Args...>(args...));
-		return result;
-	}*/
-	/*template<class F, class... Args>*/
-	/*virtual void install_model(tuple<Args...> parameter) = 0;*/
-	virtual void simulate()=0;
+    /*template<class F, class... Args>*/
+    /*vector<tuple<Args...> > parameter(F &&f,Args && ... args) {
+        vector<tuple<Args...>> result;
+        result.push_back(tuple<Args...>(args...));
+        return result;
+    }*/
+    /*template<class F, class... Args>*/
+    /*virtual void install_model(tuple<Args...> parameter) = 0;*/
+    virtual void simulate()=0;
 
 };
 class SecondNuclear :public Simulator {
@@ -36,7 +64,10 @@ public:
 		//			r.py_input_one_FCC([i, j, 0], 128, 2, 1, [1] * 128, 0)
 	}
 
-    void simulate() override {}
+    void simulate() override {
+        auto b = Cartesian_product(vector<int>{1, 2}, vector<int>{3, 4}, vector<int>{1, 2});
+        b.clear();
+    }
 	/*def __init__(self) :
 		super(Simulator, self).__init__()
 		if not os.path.exists('Complex') :

@@ -25,7 +25,6 @@ class Simulator():
 class PBS_PBMS(Simulator):
     def __init__(self):
         super(Simulator, self).__init__()
-        super(Simulator, self).__init__()
         if not os.path.exists('Complex'):
             os.mkdir('Complex')
 

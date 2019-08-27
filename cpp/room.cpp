@@ -3,6 +3,7 @@
 #include<stack>
 #include<tuple>
 #include<fstream>
+#include <utility>
 #include"ConnectedComponent.h"
 
 inline bool find_in_que(const deque<vec> &que, vec p) {
@@ -11,19 +12,37 @@ inline bool find_in_que(const deque<vec> &que, vec p) {
 	return iter != que.end() ? true : false;
 }
 
+Room::Room(int x, int y, int z, int type) : lattice(x, y, z), shape(vec{x, y, z}) {
+    cout << "construction" << endl;
+    if (type == 8) {
+        cout << "using type8" << endl;
+        count_parallel = &Room::count_parallel_nearby8;
+    } else if (abs(b2a) > 1e-10) {
+        cout << "using count_parallel_B" << endl;
+        count_parallel = &Room::count_parallel_B;
+    } else {
+        cout << "using count_parallel_nearby24" << endl;
+        count_parallel = &Room::count_parallel_nearby24;
+    }
+
+    initmoves();
+    srand(time(NULL));
+    //cout<< time(NULL);
+}
 Room::Room(int x, int y, int z,
            vector<vector<double> > Ep, vector<vector<double> > Eb, int type)
         : lattice(x, y, z), shape(vec{x, y, z}) {
-	Ep_matrix = Ep;
-	Eb_matrix = Eb;
-	if (type==4) {
-		cout << "using type4" << endl;
+    Ep_matrix = std::move(Ep);
+    Eb_matrix = std::move(Eb);
+    if (type == 8) {
+        cout << "using type8" << endl;
 		count_parallel = &Room::count_parallel_nearby8;
-	}
-	else if (abs(b2b) > 0) {
+	} else if (abs(b2a) > 1e-10) {
+        cout << "using count_parallel_B" << endl;
 		count_parallel = &Room::count_parallel_B;
 	}
 	else {
+        cout << "using count_parallel_nearby24" << endl;
 		count_parallel = &Room::count_parallel_nearby24;
 	}
 
@@ -289,21 +308,24 @@ void Room::stepMove(vec & position, vec & next_position, stack<vec>& path)
 
 void Room::localSnakeMove(int i, stack<vec> &path)
 {
-	int length = polymer_list[i].length;
+    Polymer &polymer = polymer_list[i];
+    int length = polymer.length;
+
 	if (length == 0) return;
-	if (polymer_list[i][0]->moveable == 1) return;
+    if (polymer[0]->moveable == 1) return;
 	int start_point = rand() % length;
-	shared_ptr<Point> pol_iter = polymer_list[i][start_point];
+    shared_ptr<Point> pol_iter = polymer[start_point];
+
 	vec p1, p2;
 
 	int m_rand = rand() % moves.size();
 	vec direction(moves[m_rand]);
 	vec p_next;
 	if (canMove((*pol_iter).location, direction)) {
-		p_next = ((*pol_iter).location + direction) % shape;
+        p_next = ((*pol_iter).location + direction) % shape;
 		if (start_point > 0 && start_point < length - 1) {
-			if (distance_squre(p_next, polymer_list[i][start_point + 1]->location) > dimension &&
-				distance_squre(p_next, polymer_list[i][start_point - 1]->location) > dimension)
+            if (distance_squre(p_next, polymer[start_point + 1]->location) > dimension &&
+                distance_squre(p_next, polymer[start_point - 1]->location) > dimension)
 			{
 				return;
 			}
@@ -321,10 +343,10 @@ void Room::localSnakeMove(int i, stack<vec> &path)
 
 	//if (can_move.empty())return;
 	for (int j = start_point - 1; j > -1; j--) {
-		if (distance_squre(polymer_list[i][j]->location, polymer_list[i][j + 1]->location) > dimension) {
+        if (distance_squre(polymer[j]->location, polymer[j + 1]->location) > dimension) {
 			try {
 				if (lattice[p1] == nullptr) {
-					vec t1 = polymer_list[i][j]->location;
+                    vec t1 = polymer[j]->location;
 					stepMove(t1, p1, path);
 					p1 = t1;
 				}
@@ -341,10 +363,10 @@ void Room::localSnakeMove(int i, stack<vec> &path)
 		}
 	}
 	for (int j = start_point + 1; j < length; j++) {
-		if (distance_squre(polymer_list[i][j]->location, polymer_list[i][j - 1]->location) > dimension) {
+        if (distance_squre(polymer[j]->location, polymer[j - 1]->location) > dimension) {
 			try {
 				if (lattice[p2] == nullptr) {
-					vec t2 = polymer_list[i][j]->location;
+                    vec t2 = polymer[j]->location;
 					stepMove(t2, p2, path);
 					p2 = t2;
 				}
@@ -423,6 +445,25 @@ void Room::movie(int m, int n, double T)
 	//results->append(Ep_list);
 	//cout << "list";
 
+
+}
+
+void Room::preheat(int m) {
+
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < polymer_list.size(); j++) {
+
+            stack<vec> path;
+            this->localSnakeMove(j, path);
+            //TODO if 有交叉，repair；
+            if (path.empty()) {
+                continue;
+            }
+
+        }
+
+
+    }
 
 }
 
@@ -729,9 +770,10 @@ double Room::cal_one_Ep(int i)const
 	//分子内的要除二，而分子外的不用除二；
 	deque<vec> a;
 	double num = 0;
-	int length = polymer_list[i].length;
+    const Polymer &polymer = polymer_list[i];
+    int length = polymer.length;
 	for (int j = 1; j < length; j++) {
-		num += (this->*count_parallel)(polymer_list[i][j - 1]->location, polymer_list[i][j]->location, a, 0);
+        num += (this->*count_parallel)(polymer[j - 1]->location, polymer[j]->location, a, 0);
 	}
 	return num;
 }
@@ -985,12 +1027,12 @@ double Room::count_parallel_B(vec &point1, vec &point2,
                 if (i == 0) {
                     if (result == chain_num) {
                         if (find_in_que(que, p1) && find_in_que(que, p2)) {
-                            num_self -= 0.5;
+                            num_self -= 1.0;
                         } else {
-                            num_self -= 1;
+                            num_self -= 2.0;
                         }
                     } else {
-                        num_others -= 1;
+                        num_others -= 2.0;
                     }
                 }
 				if (result == chain_num) {
@@ -1010,11 +1052,11 @@ double Room::count_parallel_B(vec &point1, vec &point2,
 
 	if (cal_type == 0) {
 		return num_others + num_self / 2.0;
-		//cout << num_others << ',' << num_self << endl;
+        cout << num_others << ',' << num_self << endl;
 	}
 	else {
 		if (num_self != 0) {
-			//cout << num_others << ',' << num_self << endl; 
+//			cout << num_others << ',' << num_self << endl;
 		}
         return num_others + num_self;// TODO
 	}
@@ -1041,6 +1083,7 @@ double Room::cal_Rg()const// 均方旋转半径
 
 double Room::cal_h2()const// 均方末端距
 {
+    throw "NOT DONE!";
 	double num = 0;
 	for (auto &p : polymer_list) {
 		num += distance_squre(p.chain[0]->location, p.chain.back()->location);
@@ -1288,3 +1331,7 @@ vector<int> Room::cal_thick_by_point()const//计算厚度
 	//return thickness;
     return vector<int>();
 }
+
+
+
+
