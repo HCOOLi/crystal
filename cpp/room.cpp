@@ -1014,9 +1014,6 @@ double Room::count_parallel_B(vec &point1, vec &point2,
 			continue;
 		}
 		for (int i = 0; i < 5; i++) {
-            if (i == 1) {
-
-            }
 			p1 = (point1 + i * direc) % shape;
 			p2 = (point2 + i * direc) % shape;
 			int result = get_side_num(p1, p2);
@@ -1027,12 +1024,12 @@ double Room::count_parallel_B(vec &point1, vec &point2,
                 if (i == 0) {
                     if (result == chain_num) {
                         if (find_in_que(que, p1) && find_in_que(que, p2)) {
-                            num_self -= 1.0;
-                        } else {
                             num_self -= 2.0;
+                        } else {
+                            num_self -= 4.0;
                         }
                     } else {
-                        num_others -= 2.0;
+                        num_others -= 4.0;
                     }
                 }
 				if (result == chain_num) {

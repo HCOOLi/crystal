@@ -31,10 +31,10 @@ class SecondNuclear(Simulator):
 
     def parameters(self):
         import itertools
-        Ep = [1.0]
+        Ep = [1]  # list(np.arange(0.01,0.1, 0.02))
         length = [64]
         # T = [2.2, 2.4, 2.6, 2.8,3.2, 3.4, 3.6, 3.8,4.0,4.2]
-        T = list(np.arange(3.0, 5.0, 0.1))
+        T = list(np.arange(4.0, 10.0, 1.0))
         d = [0]
         return itertools.product(Ep, d, T)
 
@@ -47,17 +47,17 @@ class SecondNuclear(Simulator):
         :return:
         """
         for i in range(0, r.shape[1]):
-            r.py_input_one_ECC([0, i, 8], 16, 2, [1] * 16, 1)
-        # for i in range(0, r.shape[2], d):
-        #     r.py_input_one_ECC([15, 0, i], r.shape[1], 1, [0] * r.shape[1], 1)
+            r.py_input_one_ECC([0, i, 8], 20, 2, [1] * 20, 1)
+        for i in range(0, r.shape[2], ):
+            r.py_input_one_ECC([47, 0, i], r.shape[1], 1, [0] * r.shape[1], 1)
         # for i in range(0, r.shape[2], 3):
         #     r.py_input_one_ECC([62, 0, i], r.shape[1], 1, [0] * r.shape[1], 1)
 
-        for i in range(2, int((r.shape[0] - 1) / 1.5)):
+        for i in range(2, int((r.shape[0] - 1))):
             # if i == 15 or i == 62:
             #     continue
             for j in range(0, r.shape[1] - 1, 2):
-                r.py_input_one_FCC([i, j, 0], 64, 2, 1, [1] * 64, 0)
+                r.py_input_one_FCC([i, j, 0], 80, 2, 1, [1] * 80, 0)
 
     @staticmethod
     def simulate(parameter):
@@ -67,12 +67,12 @@ class SecondNuclear(Simulator):
             print('Run task %f ,%f,%f(%s)...' % (Ep, 1, T, os.getpid()))
             # start = time.time()
             # EC_max = 31 * 31 * (31 - 1)
-            date = "2019-8-27-m=-2.0-x=1.5"
+            date = "2019-9-1-m=-4.0"
             if not os.path.exists('Data'):
                 os.mkdir('Data')
             if not os.path.exists('Data/' + date + '/'):
                 os.mkdir('Data/' + date + '/')
-            r = pyRoom(48, 48, 48, Ep=[[0, 0], [0, Ep]], Eb=[[0, 0], [0, 0]], roomtype=24)
+            r = pyRoom(48, 48, 48, Ep=[[0, 0], [0, Ep]], Eb=[[0, 0], [0, 0]], roomtype=4)
             # E_list, Ec_list, Ep_list, t_list = [], [], [], []
 
             SecondNuclear.install_model(r, d)
@@ -114,7 +114,7 @@ if __name__ == '__main__':
     # S.simulate(parameter_list[1])
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
-        with Pool(10) as p:
+        with Pool(12) as p:
             p.map_async(S.simulate, parameter_list)
             p.close()
             p.join()

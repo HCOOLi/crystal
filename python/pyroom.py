@@ -257,8 +257,8 @@ class pyRoom(pyroom):
     def draw_a_layer_plot_json(self, layer, polylist, title=None):
         plt.figure(figsize=(10, 5))
         ax1 = plt.subplot(1, 2, 1)
-        ax1.plot([0, 32], [8, 8])
-        ax1.plot([0, 32], [23, 23])
+        ax1.plot([0, 48], [8, 8])
+        ax1.plot([0, 48], [28, 28])
         ax2 = plt.subplot(1, 2, 2)
         countlist = []
         count = 0
@@ -313,7 +313,7 @@ class pyRoom(pyroom):
                             last_point = None
                     if last_point != None:
                         if point[1] == last_point[1] and 8 <= min(point[2], last_point[2]) and max(point[2],
-                                                                                                   last_point[2]) < 24:
+                                                                                                   last_point[2]) < 29:
                             ax1.plot([point[1], last_point[1]], [point[2], last_point[2]], color="red")
                             count += 1
                         else:
@@ -346,11 +346,11 @@ class pyRoom(pyroom):
         time = 1
         with open(filepath, 'r') as file:
             all_line_txt = file.readline()  # 读所有行
-            all_line_txt = all_line_txt.replace("position", "p").replace("type", "t").replace("chain", "c").replace(
-                "moveable", "m")
+            #     all_line_txt = all_line_txt.replace("position", "p").replace("type", "t").replace("chain", "c").replace(
+            #         "moveable", "m")
             polymerlist = json.loads(all_line_txt)
-        with open(filepath, 'w') as file:
-            file.writelines(all_line_txt)
+        # with open(filepath, 'w') as file:
+        #     file.writelines(all_line_txt)
 
         try:
             return polymerlist['data']

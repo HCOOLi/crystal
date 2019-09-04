@@ -1,4 +1,4 @@
 *.o
 *.so
 *.pyd
-*.json
+/python/Data/

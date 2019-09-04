@@ -7,14 +7,14 @@ import numpy as np
 from pyroom import *
 
 
-def drawpicture(date, T):
+def drawpicture(date, Ep, T):
     path = './Data/' + date + '/'
-    picpath = './Data/' + date + '-1.0-' + T + '/'
+    picpath = ('./Data/' + date + '-%3.2f-%3.2f/') % (Ep, Ep * T)
     if not os.path.exists(picpath):
         os.mkdir(picpath)
 
-    for i in range(1000):
-        filename = ('d=0E%d=1.00,T=' + T + '.json') % i
+    for i in range(1, 1000):
+        filename = ('d=0E%d=%3.2f,T=%3.2f.json') % (i, Ep, Ep * T)
         r = pyRoom(64, 64, 64, Ep=[[0, 0, 0], [0, 0, 2], [0, 2, 0]], Eb=[[0, 0, 0], [0, 0, 0], [0, 0, 0]], roomtype=4)
         print(path + filename)
         polymerlist = r.load_polymer(filepath=path + filename)
@@ -55,15 +55,17 @@ def drawpicture(date, T):
 if __name__ == '__main__':
     start = time.time()
     print('Parent process %s.' % os.getpid())
-    # S.simulate(parameter_list[1])
+    date = '2019-9-1-Ec=0'
+
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
-        with Pool(10) as p:
-            date = '2019-8-24-m=-2.0-x=1.5'
+        with Pool(12) as p:
+
             # for T in ["4.60", "4.80", "4.40"]:"2.20","2.40","2.60","2.80",
             # for T in ["3.00","3.20","3.40","3.60","3.80","4.00","4.20","4.60", "4.80", "4.40"]:
-            for T in ['%3.2f' % x for x in np.arange(3.1, 5, 0.2)]:
-                p.apply_async(drawpicture, (date, T))
+            for Ep in np.arange(0.01, 0.10, 0.02):
+                for T in np.arange(4.0, 10.0, 1.0):
+                    p.apply_async(drawpicture, (date, Ep, T))
             p.close()
             p.join()
     except:

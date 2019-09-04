@@ -51,10 +51,10 @@ public:
 	Grid lattice;
 	vector< vec > moves;
 	//parameters
-	const double Ec0 = 1.0;
+    const double Ec0 = 0.0;
 	vector<vector<double> > Eb_matrix;
 	vector<vector<double> > Ep_matrix;
-    const double b2a = 0.5;//TODO
+    const double b2a = 0.0;//TODO
 	const double b2b = 0.0;
 	const double b2c = 0.0;
 
