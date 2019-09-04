@@ -78,7 +78,7 @@ class SecondNuclear(Simulator):
             SecondNuclear.install_model(r, d)
             print("install model")
             # r.draw_all()
-            r.movie(1000000, 10000, 100)
+            r.preheat(1000000)
             print("end preheat")
             # r.movie(2000000, 10000, T*Ep)
             # # E_list, Ec_list, Ep_list, t_list, f = r.step_heating(6 * Ep+0.1, 1 * Ep, -0.1 * Ep,10000,5000, EC_max)

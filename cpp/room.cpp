@@ -336,7 +336,7 @@ void Room::localSnakeMove(int i, stack<vec> &path)
 		stepMove((*pol_iter).location, p_next, path);
 		//break;
 	}
-	// Ä£Ê½2
+        // æ¨¡å¼2
 	else {
 		return;
 	}
@@ -351,7 +351,7 @@ void Room::localSnakeMove(int i, stack<vec> &path)
 					p1 = t1;
 				}
 				else {
-					cout << "±»Õ¼ÓÃÁË1";
+                    cout << "è¢«å ç”¨äº†1";
 				}
 			}
 			catch (...) {
@@ -371,7 +371,7 @@ void Room::localSnakeMove(int i, stack<vec> &path)
 					p2 = t2;
 				}
 				else {
-					cout << "±»Õ¼ÓÃÁË2" << endl;
+                    cout << "è¢«å ç”¨äº†2" << endl;
 				}
 			}
 			catch (...) {
@@ -397,7 +397,7 @@ void Room::movie(int m, int n, double T)
 
 			stack<vec> path;
 			this->localSnakeMove(j, path);
-			//TODO if ÓĞ½»²æ£¬repair£»
+            //TODO if æœ‰äº¤å‰ï¼Œrepairï¼›
 			if (path.empty()) {
 				continue;
 			}
@@ -455,7 +455,7 @@ void Room::preheat(int m) {
 
             stack<vec> path;
             this->localSnakeMove(j, path);
-            //TODO if ÓĞ½»²æ£¬repair£»
+            //TODO if æœ‰äº¤å‰ï¼Œrepairï¼›
             if (path.empty()) {
                 continue;
             }
@@ -767,7 +767,7 @@ double Room::cal_Eb() const
 
 double Room::cal_one_Ep(int i)const
 {
-	//·Ö×ÓÄÚµÄÒª³ı¶ş£¬¶ø·Ö×ÓÍâµÄ²»ÓÃ³ı¶ş£»
+    //åˆ†å­å†…çš„è¦é™¤äºŒï¼Œè€Œåˆ†å­å¤–çš„ä¸ç”¨é™¤äºŒï¼›
 	deque<vec> a;
 	double num = 0;
     const Polymer &polymer = polymer_list[i];
@@ -1060,8 +1060,7 @@ double Room::count_parallel_B(vec &point1, vec &point2,
 }
 
 
-
-double Room::cal_Rg()const// ¾ù·½Ğı×ª°ë¾¶
+double Room::cal_Rg() const// å‡æ–¹æ—‹è½¬åŠå¾„
 {
     throw "NOT DONE!";
 	double num = 0;
@@ -1078,7 +1077,7 @@ double Room::cal_Rg()const// ¾ù·½Ğı×ª°ë¾¶
 	return 0.0;
 }
 
-double Room::cal_h2()const// ¾ù·½Ä©¶Ë¾à
+double Room::cal_h2() const// å‡æ–¹æœ«ç«¯è·
 {
     throw "NOT DONE!";
 	double num = 0;
@@ -1188,8 +1187,7 @@ ostream & operator<<(ostream & o, Polymer & p)
 }
 
 
-
-vector<int> Room::cal_thickness()const//¼ÆËãºñ¶È
+vector<int> Room::cal_thickness() const//è®¡ç®—åšåº¦
 {
 
 	matrix::Matrix3 temp_lattice(shape[0], shape[1], shape[2] - 1);
@@ -1228,7 +1226,7 @@ vector<int> Room::cal_thickness()const//¼ÆËãºñ¶È
 }
 
 
-vector<int> Room::cal_thick_by_point()const//¼ÆËãºñ¶È
+vector<int> Room::cal_thick_by_point() const//è®¡ç®—åšåº¦
 {
 	//py::list thicka, thickb, thickc;
 	//py::list *thickness = new py::list;

@@ -55,7 +55,7 @@ def drawpicture(date, Ep, T):
 if __name__ == '__main__':
     start = time.time()
     print('Parent process %s.' % os.getpid())
-    date = '2019-9-1-Ec=0'
+    date = '2019-9-1-m=-4.0'
 
     try:
         # with ProcessPoolExecutor(max_workers=5) as p:
@@ -63,7 +63,7 @@ if __name__ == '__main__':
 
             # for T in ["4.60", "4.80", "4.40"]:"2.20","2.40","2.60","2.80",
             # for T in ["3.00","3.20","3.40","3.60","3.80","4.00","4.20","4.60", "4.80", "4.40"]:
-            for Ep in np.arange(0.01, 0.10, 0.02):
+            for Ep in [1]:
                 for T in np.arange(4.0, 10.0, 1.0):
                     p.apply_async(drawpicture, (date, Ep, T))
             p.close()

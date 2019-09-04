@@ -54,7 +54,7 @@ public:
     const double Ec0 = 0.0;
 	vector<vector<double> > Eb_matrix;
 	vector<vector<double> > Ep_matrix;
-    const double b2a = 0.0;//TODO
+    const double b2a = 0.7;//TODO
 	const double b2b = 0.0;
 	const double b2c = 0.0;
 
